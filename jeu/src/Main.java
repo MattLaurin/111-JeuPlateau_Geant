@@ -3,6 +3,6 @@ public class Main {
         System.out.println("Hello world!");
 
         plateau plt= new plateau();
-        plt.printPlateau();
+        plt.printBoard();
     }
 }
