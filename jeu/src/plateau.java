@@ -37,7 +37,7 @@ public class plateau {
         return new int[]{boardIndex, localRow, localCol};
     }
 
-    private String indexToMove(int boardIndex, int row, int col){
+    private String intConvertMove(int boardIndex, int row, int col){
         int globalCol = (boardIndex % 3) * 3 + col;
         int globalRow = (boardIndex / 3) * 3 + row;
 
