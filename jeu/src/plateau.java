@@ -23,17 +23,17 @@ public class plateau {
     }
 
     // Ca sert a convertir A8 par exemple en (Quel board jouer, la rangée et la colonne) donc ici ex : (1, 0, 7)
-    private int[] moveConvertInt(String move){
+    public int[] moveConvertInt(String move){
         char lettreCol = move.charAt(0);
         int nbRow = Character.getNumericValue(move.charAt(1));
 
         int col = lettreCol - 'A'; // A-I  à 0-8
-        int row = nbRow - 1; // 1 - 9 --> 0 - 8 
+        int row = 9 - nbRow; // 1 - 9 --> 0 - 8 
 
-        int boardIndex = (col / 3 ) *3 + (row / 3); // 0-8
+        int boardIndex = (row / 3 ) *3 + (col / 3); // 0-8
         int localRow = row % 3; // 0-2
         int localCol = col % 3; // 0-2
-
+        System.out.println(boardIndex);
         return new int[]{boardIndex, localRow, localCol};
     }
 
