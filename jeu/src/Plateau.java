@@ -141,10 +141,16 @@ public class Plateau {
     private int evaluateForMinMax(){
         return 0; // doit retourner 100 -100 ou 0
     }
+
+    private Boolean evaluateLocalBoard(int indiceBoardGlobal){
+        
+        return true;
+    }
     public void play(String move){
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
         this.boardLocal[Character.getNumericValue( tab1[0])][Character.getNumericValue( tab1[1])][Character.getNumericValue( tab1[2])]=move;
+        //Evaluer le board Local apres avoir joué pour savoir s'il est gagné ou non
 
         //retirer le mov de la liste des moves available
         this.availableMoves.remove(tab);
