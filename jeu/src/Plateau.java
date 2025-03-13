@@ -111,7 +111,7 @@ public class Plateau {
         }
 
     }
-
+a
     // Retourne vrai si un joueur a gagne une partie locale
     public boolean checkForLocalWin() {
         for (int i = 0; i < 9; i++) {
@@ -125,22 +125,84 @@ public class Plateau {
     public boolean checkForGlobalWin() {
         return false;
     }*/
-    public String getNextMove(String move){
 
-        ArrayList<String> moveDispo= generateMove(move);
-        for(String i : moveDispo){
-            MiniMaxAb();
+    // Modifier mais a revoir (17:45)
+    public String getNextMove(String lastMove){
+        int bestValue = Integer.MIN_VALUE;
+    String bestMove = null;
+    char currentPlayer = player.getCurrent();
+    char opponent = player.getOppenent();
+    ArrayList<String> moveDispo = generateMove(lastMove);
+
+    for (String move : moveDispo) {
+        play(move); // Simulate move
+        int moveValue = MiniMaxAb(3, false, currentPlayer, opponent, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        undoMove(move); // Undo move after
+
+        if (moveValue > bestValue) {
+            bestMove = move;
+            bestValue = moveValue;
         }
-        return null;
     }
-    private int  MiniMaxAb(){
+    return bestMove;
+    }
 
-        return 0;
+    //
+    // MODIFICATION 17:32 matt (MINMAX DE L'AUTRE LAB)
+    //
+    private int MiniMaxAb(int depth, boolean isMaximising, char player, char opponent, int alpha, int beta) {
+        int boardValue = evaluateForMinMax();
+        if (Math.abs(boardValue) == 100 || availableMoves.isEmpty() || depth == 0) {
+            return boardValue;
+        }
+
+        if (isMaximising) { // AI turn
+            int maxEval = Integer.MIN_VALUE;
+            for (String move : availableMoves) {
+                play(move);
+                int eval = MiniMaxAb(depth - 1, false, player, opponent, alpha, beta);
+                undoMove(move);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) break; // L'elagage
+            }
+            return maxEval;
+        } else { // Opponent's turn
+            int minEval = Integer.MAX_VALUE;
+            for (String move : availableMoves) {
+                play(move);
+                int eval = MiniMaxAb(depth - 1, true, player, opponent, alpha, beta);
+                undoMove(move);
+                minEval = Math.min(minEval, eval);
+                beta = Math.min(beta, eval);
+                if (beta <= alpha) break;  // L'elagage
+            }
+            return minEval;
+        }
     }
+
+     //
+    // MODIFICATION 17:32 matt (MINMAX DE L'AUTRE LAB)
+    //
+    public void undoMove(String move) {
+        String tab = moveConvertInt(move);
+        char[] tab1 = tab.toCharArray();
+        this.boardLocal[Character.getNumericValue(tab1[0])][Character.getNumericValue(tab1[1])][Character.getNumericValue(tab1[2])] = "-";
+
+        // Add le move au truc possible vu qu'on la "undo"
+        this.availableMoves.add(tab);
+    }
+    //
+    // MODIFICATION 17:32 matt
+    //
+
+
 
     private int evaluateForMinMax(){
         return 0; // doit retourner 100 -100 ou 0
     }
+
+
     public void play(String move){
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
@@ -150,7 +212,7 @@ public class Plateau {
         this.availableMoves.remove(tab);
     }
     public ArrayList<String> generateMove(String Move){
-        if(Move==""){
+        if(Move.isEmpty()){
             return this.availableMoves;
         }else{
             int tableLocal=returnGlobalCase(Move);
