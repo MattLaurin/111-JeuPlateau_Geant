@@ -55,17 +55,13 @@ public class Plateau {
         int rowNumber = 9 - globalRow;
         return Character.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
     }
-    public String intConvertMove2(){
-
-        return null;
-    }
-
+   
     // Demande au joueur de faire son move et le retourne
-    private String askForMove(char player, Scanner scanner) {
+    /*private String askForMove(char player, Scanner scanner) {
         System.out.println();
         System.out.print("Joueur (" + player + ") faites votre move : ");
         return scanner.nextLine();
-    }
+    }*/
 
     // Retourne true si le move est legal
     private boolean isLegalMove(String move) {
@@ -89,7 +85,7 @@ public class Plateau {
     }
 
     // Fonction pour jouer un move
-    public void playMove(char c, Scanner scanner) {
+    /*public void playMove(char c, Scanner scanner) {
         String move = askForMove(c, scanner);
 
         while (!isLegalMove(move)) {
@@ -128,7 +124,7 @@ public class Plateau {
     // Retourne vrai si un joeur a gagne la partie globale
     public boolean checkForGlobalWin() {
         return false;
-    }
+    }*/
     public void play(String move){
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
