@@ -150,11 +150,11 @@ public class Plateau {
         char[] tab1= tab.toCharArray();
 
         if(Character.getNumericValue(tab1[1])==0){
-            return Character.getNumericValue(tab1[2])+6;
+            return Character.getNumericValue(tab1[2]);
         }else if(Character.getNumericValue(tab1[1])==1){
             return Character.getNumericValue(tab1[2])+3;
         }else if(Character.getNumericValue(tab1[1])==2){
-            return Character.getNumericValue(tab1[2])+1;
+            return Character.getNumericValue(tab1[2])+6;
         }
 
         return -1;
