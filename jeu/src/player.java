@@ -1,8 +1,8 @@
-public class player {
+public class Player {
     private char current;
     private char oppenent;
 
-    public player(char i){
+    public Player(char i){
         if(i=='1'){
             this.current='O'; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
             this.oppenent='X';
