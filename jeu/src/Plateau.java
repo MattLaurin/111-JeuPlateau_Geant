@@ -7,6 +7,11 @@ public class Plateau {
                                                                   // a = numero du board, b = numero de la row et c =
                                                                   // numero de la col
     private ArrayList<Integer> availableLocalBoards = new ArrayList<>(); // Les valeurs vont de 0 a 8
+    /**
+     *  des qu'un plateau local est gagné,on met celui qui a gagné(X or O) a l'indice correspondant a l'indice du tableau local
+     *  exple si X gagne le plateau 3 on met X dans l'indice 3 du tableau indiceLocalBoardComplete
+     */
+    private String [] indiceLocalBoardComplete= new String[9];
     private Player player;
 
     public Plateau() {
@@ -23,6 +28,8 @@ public class Plateau {
                 }
             }
         }
+
+        int i=0;
     }
 
     // Ca sert a convertir A8 par 107 (Quel board jouer, la rangée et la colonne)
@@ -126,18 +133,28 @@ public class Plateau {
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
         this.boardLocal[Character.getNumericValue( tab1[0])][Character.getNumericValue( tab1[1])][Character.getNumericValue( tab1[2])]=move;
+
+        //retirer le mov de la liste des moves available
+        this.availableMoves.remove(tab);
     }
     public ArrayList<String> generateMove(String Move){
         int tableLocal=returnGlobalCase(Move);
-        ArrayList<String> tabMoveAvailable = new ArrayList<String>();
-        for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
-                if(boardLocal[tableLocal][i][j]=="-"){
-                    tabMoveAvailable.add( intConvertMove(tableLocal,i,j));
+
+        if(indiceLocalBoardComplete[tableLocal]!=null){
+
+            return this.availableMoves;
+        }else{
+            ArrayList<String> tabMoveAvailable = new ArrayList<String>();
+            for(int i=0;i<3;i++){
+                for(int j=0;j<3;j++){
+                    if(boardLocal[tableLocal][i][j]=="-"){
+                        tabMoveAvailable.add( intConvertMove(tableLocal,i,j));
+                    }
                 }
             }
+            return tabMoveAvailable;
         }
-        return tabMoveAvailable;
+
     }
 
     /**
