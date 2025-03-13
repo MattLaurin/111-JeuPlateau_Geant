@@ -7,8 +7,11 @@ public class Plateau {
                                                                   // a = numero du board, b = numero de la row et c =
                                                                   // numero de la col
     private ArrayList<Integer> availableLocalBoards = new ArrayList<>(); // Les valeurs vont de 0 a 8
+    private Player player;
 
     public Plateau() {
+
+        player = new Player('1'); // set le player...
         boardGlobal = new String[3][3];
         boardLocal = new String[9][3][3]; // 9 tableau de 3x3
 
@@ -121,6 +124,12 @@ public class Plateau {
     // Retourne vrai si un joeur a gagne la partie globale
     public boolean checkForGlobalWin() {
         return false;
+    }
+    public void play(String move){
+
+    }
+    public void setPlayers(char c){
+        this.player = new Player(c);
     }
 
     public void printBoard() {
