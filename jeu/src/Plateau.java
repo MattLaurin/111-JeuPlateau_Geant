@@ -10,7 +10,6 @@ public class Plateau {
     private Player player;
 
     public Plateau() {
-
         player = new Player('1'); // set le player...
         boardGlobal = new String[3][3];
         boardLocal = new String[9][3][3]; // 9 tableau de 3x3
@@ -20,30 +19,24 @@ public class Plateau {
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 3; col++) {
                     boardLocal[i][row][col] = "-"; // 0 = case vide
-                    availableMoves.add(Integer.toString(i) + Integer.toString(row) + Integer.toString(col)); // Ajoute
-                                                                                                             // chaque
-                                                                                                             // cases
-                                                                                                             // dans les
-                                                                                                             // moves
-                                                                                                             // available
+                    availableMoves.add(Integer.toString(i) + Integer.toString(row) + Integer.toString(col)); // Ajoute chaque case dans les moves available
                 }
             }
         }
     }
 
     // Ca sert a convertir A8 par 107 (Quel board jouer, la rangée et la colonne)
-    private String moveConvertInt(String move) {
-        char lettre = move.charAt(0);
-        char chiffre = move.charAt(1);
-
-        int chiffreInt = Character.getNumericValue(chiffre);
-        int col = lettre - 'A';
-        int row = chiffreInt - 1;
-
-        int boardIndex = (col / 3) * 3 + (row / 3);
-        int localRow = row % 3;
-        int localCol = col % 3;
-
+    public String moveConvertInt(String move) {
+        char lettreCol = move.charAt(0);
+        int nbRow = Character.getNumericValue(move.charAt(1));
+    
+        int col = lettreCol - 'A'; // A-I  à 0-8
+        int row = 9 - nbRow; // 1 - 9 --> 0 - 8 
+    
+        int boardIndex = (row / 3) * 3 + (col / 3); // Ajustement pour savoir quel board jouer 
+        int localRow = row % 3; // 0-2
+        int localCol = col % 3; // 0-2
+    
         return Integer.toString(boardIndex) + Integer.toString(localRow) + Integer.toString(localCol);
     }
 
@@ -52,8 +45,8 @@ public class Plateau {
         int globalRow = (boardIndex / 3) * 3 + row;
 
         char colLetter = (char) ('A' + globalCol);
-        int rowNumber = globalRow + 1;
-        return Integer.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
+        int rowNumber = 9 - globalRow;
+        return Character.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
     }
     public String intConvertMove2(){
 
@@ -171,25 +164,23 @@ public class Plateau {
     }
 
     public void printBoard() {
-        System.out.println("  -----------------------");
-
-        for (int globalRow = 8; globalRow >= 0; globalRow--) {
-            if (globalRow % 3 == 2 && globalRow != 8) {
+        for (int row = 0; row < 9; row++) {
+            if (row % 3 == 0) {
                 System.out.println("  -----------------------");
             }
-            System.out.print((globalRow + 1) + " ");
-            for (int globalCol = 0; globalCol < 9; globalCol++) {
-                if (globalCol % 3 == 0)
+            System.out.print((9 - row) + " "); // Ca print le 1 - 2- ... 9 a gauche ca 
+            for (int col = 0; col < 9; col++) {
+                if (col % 3 == 0) {
                     System.out.print("| ");
-                int boardIndex = (globalCol / 3) * 3 + (globalRow / 3);
-                int row = globalRow % 3;
-                int col = globalCol % 3;
-                System.out.print(boardLocal[boardIndex][row][col] + " ");
+                }
+                int boardIndex = (row / 3) * 3 + (col / 3);
+                int localRow = row % 3;
+                int localCol = col % 3;
+                System.out.print(boardLocal[boardIndex][localRow][localCol] + " ");
             }
             System.out.println("|");
         }
         System.out.println("  -----------------------");
         System.out.println("    A B C   D E F   G H I");
     }
-
 }
