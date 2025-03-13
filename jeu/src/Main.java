@@ -5,7 +5,17 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Plateau plateau= new Plateau();
         Player joueur = new Player('1');
-        int nbTurns = 0;
+       plateau.play("I1");
+
+        plateau.play("F4");
+
+        plateau.play("B1");
+
+        plateau.generateMove("B1");
+        String g=plateau.intConvertMove(1,0,7);
+
+        plateau.printBoard();
+        /*int nbTurns = 0;
         char playerTurn;
 
         while (!plateau.checkForGlobalWin()) {
@@ -24,6 +34,6 @@ public class Main {
             nbTurns++;
         }
         
-        scanner.close();
+        scanner.close();*/
     }
 }

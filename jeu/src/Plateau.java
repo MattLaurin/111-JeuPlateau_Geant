@@ -7,8 +7,11 @@ public class Plateau {
                                                                   // a = numero du board, b = numero de la row et c =
                                                                   // numero de la col
     private ArrayList<Integer> availableLocalBoards = new ArrayList<>(); // Les valeurs vont de 0 a 8
+    private Player player;
 
     public Plateau() {
+
+        player = new Player('1'); // set le player...
         boardGlobal = new String[3][3];
         boardLocal = new String[9][3][3]; // 9 tableau de 3x3
 
@@ -44,13 +47,17 @@ public class Plateau {
         return Integer.toString(boardIndex) + Integer.toString(localRow) + Integer.toString(localCol);
     }
 
-    private String intConvertMove(int boardIndex, int row, int col) {
+    public String intConvertMove(int boardIndex, int row, int col) {
         int globalCol = (boardIndex % 3) * 3 + col;
         int globalRow = (boardIndex / 3) * 3 + row;
 
         char colLetter = (char) ('A' + globalCol);
         int rowNumber = globalRow + 1;
         return Integer.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
+    }
+    public String intConvertMove2(){
+
+        return null;
     }
 
     // Demande au joueur de faire son move et le retourne
@@ -121,6 +128,46 @@ public class Plateau {
     // Retourne vrai si un joeur a gagne la partie globale
     public boolean checkForGlobalWin() {
         return false;
+    }
+    public void play(String move){
+       String tab= moveConvertInt(move);
+       char[] tab1= tab.toCharArray();
+        this.boardLocal[Character.getNumericValue( tab1[0])][Character.getNumericValue( tab1[1])][Character.getNumericValue( tab1[2])]=move;
+    }
+    public ArrayList<String> generateMove(String Move){
+        int tableLocal=returnGlobalCase(Move);
+        ArrayList<String> tabMoveAvailable = new ArrayList<String>();
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                if(boardLocal[tableLocal][i][j]=="-"){
+                    tabMoveAvailable.add( intConvertMove(tableLocal,i,j));
+                }
+            }
+        }
+        return tabMoveAvailable;
+    }
+
+    /**
+     * returne un nombre de 0 a 8 qui equivaut a la table local ou jouer le coup
+     * @param move
+     * @return
+     */
+    public int returnGlobalCase(String move){
+        String tab= moveConvertInt(move);
+        char[] tab1= tab.toCharArray();
+
+        if(Character.getNumericValue(tab1[1])==0){
+            return Character.getNumericValue(tab1[2])+6;
+        }else if(Character.getNumericValue(tab1[1])==1){
+            return Character.getNumericValue(tab1[2])+3;
+        }else if(Character.getNumericValue(tab1[1])==2){
+            return Character.getNumericValue(tab1[2])+1;
+        }
+
+        return -1;
+    }
+    public void setPlayers(char c){
+        this.player = new Player(c);
     }
 
     public void printBoard() {
