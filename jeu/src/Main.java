@@ -1,15 +1,29 @@
-
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Scanner scanner = new Scanner(System.in);
+        Plateau plateau= new Plateau();
+        Player joueur = new Player('1');
+        int nbTurns = 0;
+        char playerTurn;
 
-        plateau plt= new plateau();
-        plt.printBoard();
-        plt.moveConvertInt("A8"); // Board index 0
-        plt.moveConvertInt("C1"); // Board index 6 
-        plt.moveConvertInt("F2"); // Board index 7
-        plt.moveConvertInt("I6"); // Board index 5 
+        while (!plateau.checkForGlobalWin()) {
+            if (nbTurns % 2 == 0) {
+                playerTurn = joueur.getCurrent();
+            } else {
+                playerTurn = joueur.getOppenent();
+            }
 
+            plateau.printBoard();
+            
+            plateau.playMove(playerTurn, scanner);
+
+            plateau.checkForLocalWin();
+
+            nbTurns++;
+        }
+        
+        scanner.close();
     }
 }
