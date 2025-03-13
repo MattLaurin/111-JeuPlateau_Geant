@@ -137,6 +137,10 @@ public class Plateau {
 
         return 0;
     }
+
+    private int evaluateForMinMax(){
+        return 0; // doit retourner 100 -100 ou 0
+    }
     public void play(String move){
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
