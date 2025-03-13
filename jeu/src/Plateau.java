@@ -55,7 +55,7 @@ public class Plateau {
         int rowNumber = 9 - globalRow;
         return Character.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
     }
-   
+
     // Demande au joueur de faire son move et le retourne
     /*private String askForMove(char player, Scanner scanner) {
         System.out.println();
@@ -125,6 +125,18 @@ public class Plateau {
     public boolean checkForGlobalWin() {
         return false;
     }*/
+    public String getNextMove(String move){
+
+        ArrayList<String> moveDispo= generateMove(move);
+        for(String i : moveDispo){
+            MiniMaxAb();
+        }
+        return null;
+    }
+    private int  MiniMaxAb(){
+
+        return 0;
+    }
     public void play(String move){
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
@@ -134,22 +146,27 @@ public class Plateau {
         this.availableMoves.remove(tab);
     }
     public ArrayList<String> generateMove(String Move){
-        int tableLocal=returnGlobalCase(Move);
-
-        if(indiceLocalBoardComplete[tableLocal]!=null){
-
+        if(Move==""){
             return this.availableMoves;
         }else{
-            ArrayList<String> tabMoveAvailable = new ArrayList<String>();
-            for(int i=0;i<3;i++){
-                for(int j=0;j<3;j++){
-                    if(boardLocal[tableLocal][i][j]=="-"){
-                        tabMoveAvailable.add( intConvertMove(tableLocal,i,j));
+            int tableLocal=returnGlobalCase(Move);
+
+            if(indiceLocalBoardComplete[tableLocal]!=null){
+
+                return this.availableMoves;
+            }else{
+                ArrayList<String> tabMoveAvailable = new ArrayList<String>();
+                for(int i=0;i<3;i++){
+                    for(int j=0;j<3;j++){
+                        if(boardLocal[tableLocal][i][j]=="-"){
+                            tabMoveAvailable.add( intConvertMove(tableLocal,i,j));
+                        }
                     }
                 }
+                return tabMoveAvailable;
             }
-            return tabMoveAvailable;
         }
+
 
     }
 

@@ -34,8 +34,7 @@ public class Client1 {
                     plateau = new Plateau();
                     plateau.setPlayers(cmd);
                     plateau.printBoard();
-                    //plateau.miniMax(cmd, plateau);
-                    String move = "C5";
+                    String move = plateau.getNextMove("");;
                     //System.out.println("-------------Le best Move est: "+move);
                    // plateau.play(move, plateau.playerMax);
 
@@ -71,8 +70,8 @@ public class Client1 {
                     System.out.println("Entrez votre coup : ");
                     int alpha = Integer.MIN_VALUE;
                     int beta = Integer.MAX_VALUE;
-                    //plateau.algoMinMax(plateau, plateau.playerMax, 3, alpha, beta);
-                    String move = "E6";
+
+                    String move = plateau.getNextMove(s);;
                     System.out.println("-------------Le best Move est: "+move);
                     plateau.play(move);
 
