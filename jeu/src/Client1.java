@@ -73,7 +73,7 @@ public class Client1 {
 
                     String move = plateau.getNextMove(s);;
                     System.out.println("-------------Le best Move est: "+move);
-                    plateau.play(move);
+                    //plateau.play(move);
 
                     System.out.println("*********************** Plateau apres avoir obtenu le coup et apre avoir joué:  ");
                     plateau.printBoard();

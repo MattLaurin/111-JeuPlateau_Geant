@@ -7,6 +7,7 @@ public class Plateau {
                                                                   // a = numero du board, b = numero de la row et c =
                                                                   // numero de la col
     private ArrayList<Integer> availableLocalBoards = new ArrayList<>(); // Les valeurs vont de 0 a 8
+    private ArrayList<String> reserveMoveForUndo = new ArrayList<String>();
     /**
      *  des qu'un plateau local est gagné,on met celui qui a gagné(X or O) a l'indice correspondant a l'indice du tableau local
      *  exple si X gagne le plateau 3 on met X dans l'indice 3 du tableau indiceLocalBoardComplete
@@ -56,14 +57,6 @@ public class Plateau {
         return Character.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
     }
 
-    // Demande au joueur de faire son move et le retourne
-    /*private String askForMove(char player, Scanner scanner) {
-        System.out.println();
-        System.out.print("Joueur (" + player + ") faites votre move : ");
-        return scanner.nextLine();
-    }*/
-
-    // Retourne true si le move est legal
     private boolean isLegalMove(String move) {
         if (move.length() != 2) {
             return false;
@@ -84,52 +77,14 @@ public class Plateau {
         return false;
     }
 
-    // Fonction pour jouer un move
-    /*public void playMove(char c, Scanner scanner) {
-        String move = askForMove(c, scanner);
-
-        while (!isLegalMove(move)) {
-            System.out.println("MOVE ILLEGAL : " + move);
-            move = askForMove(c, scanner);
-        }
-        availableMoves.remove(moveConvertInt(move));
-
-        String convertedMove = moveConvertInt(move);
-        System.out.println(
-                "MOVE : " + convertedMove.charAt(0) + " " + convertedMove.charAt(1) + " " + convertedMove.charAt(2));
-        boardLocal[convertedMove.charAt(0) - '0'][convertedMove.charAt(1) - '0'][convertedMove.charAt(2)
-                - '0'] = Character.toString(c);
-        System.out.println();
-    }
-
-    // Dessine un X ou O dans une partie locale lorsqu'elle est gagnee
-    public void updateLocalBoardOnWin(int boardIndex, char player) {
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                boardLocal[boardIndex][row][col] = Character.toString(player);
-            }
-        }
-
-    }
-
-    // Retourne vrai si un joueur a gagne une partie locale
-    public boolean checkForLocalWin() {
-        for (int i = 0; i < 9; i++) {
-            if (availableLocalBoards.contains(i)) {
-            }
-        }
-        return false;
-    }
-
-    // Retourne vrai si un joeur a gagne la partie globale
-    public boolean checkForGlobalWin() {
-        return false;
-    }*/
     public String getNextMove(String move){
 
         ArrayList<String> moveDispo= generateMove(move);
-        for(String i : moveDispo){
-            MiniMaxAb();
+
+        for(String i : generateMove(move)){
+
+                MiniMaxAb();
+
         }
         return null;
     }
@@ -142,16 +97,113 @@ public class Plateau {
         return 0; // doit retourner 100 -100 ou 0
     }
 
-    private Boolean evaluateLocalBoard(int indiceBoardGlobal){
-        
-        return true;
+    private String [] evaluateLocalBoard(int indiceBoardGlobal){
+
+        String [] tab=new String[2];
+
+        /**
+         * verification verticale
+         */
+        if(this.boardLocal[indiceBoardGlobal][0][0]==this.boardLocal[indiceBoardGlobal][1][0]){
+            if(this.boardLocal[indiceBoardGlobal][0][0]==this.boardLocal[indiceBoardGlobal][2][0]){
+
+                if(this.boardLocal[indiceBoardGlobal][2][0]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][2][0];
+                }
+            }
+
+        }else if(this.boardLocal[indiceBoardGlobal][0][1]==this.boardLocal[indiceBoardGlobal][1][1]){
+            if(this.boardLocal[indiceBoardGlobal][0][1]==this.boardLocal[indiceBoardGlobal][2][1]){
+
+                if(this.boardLocal[indiceBoardGlobal][2][0]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][2][0];
+                }
+            }
+
+        }else if(this.boardLocal[indiceBoardGlobal][0][2]==this.boardLocal[indiceBoardGlobal][1][2]){
+            if(this.boardLocal[indiceBoardGlobal][0][2]==this.boardLocal[indiceBoardGlobal][2][2]){
+
+                if(this.boardLocal[indiceBoardGlobal][2][2]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][2][2];
+                }
+            }
+
+        }
+
+        // verification horizontale
+        if(this.boardLocal[indiceBoardGlobal][0][0]==this.boardLocal[indiceBoardGlobal][0][1]){
+            if(this.boardLocal[indiceBoardGlobal][0][2]==this.boardLocal[indiceBoardGlobal][0][1]){
+
+                if(this.boardLocal[indiceBoardGlobal][0][2]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][0][2];
+                }
+            }
+
+        }else if(this.boardLocal[indiceBoardGlobal][1][0]==this.boardLocal[indiceBoardGlobal][1][1]){
+            if(this.boardLocal[indiceBoardGlobal][1][2]==this.boardLocal[indiceBoardGlobal][1][1]){
+                if(this.boardLocal[indiceBoardGlobal][1][2]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][0][2];
+                }
+            }
+
+        }else if(this.boardLocal[indiceBoardGlobal][2][0]==this.boardLocal[indiceBoardGlobal][2][1]){
+            if(this.boardLocal[indiceBoardGlobal][2][2]==this.boardLocal[indiceBoardGlobal][2][1]){
+                if(this.boardLocal[indiceBoardGlobal][2][2]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][0][2];
+                }
+            }
+
+        }
+
+        //Diagonale
+        if(this.boardLocal[indiceBoardGlobal][0][0]==this.boardLocal[indiceBoardGlobal][1][1]){
+            if(this.boardLocal[indiceBoardGlobal][0][0]==this.boardLocal[indiceBoardGlobal][2][2]){
+
+                if(this.boardLocal[indiceBoardGlobal][2][2]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][2][2];
+                }
+            }
+
+        }else if(this.boardLocal[indiceBoardGlobal][0][2]==this.boardLocal[indiceBoardGlobal][1][1]){
+            if(this.boardLocal[indiceBoardGlobal][0][2]==this.boardLocal[indiceBoardGlobal][2][0]){
+
+                if(this.boardLocal[indiceBoardGlobal][2][0]!="-"){
+                    tab[0]=String.valueOf(indiceBoardGlobal);
+                    tab[1]=this.boardLocal[indiceBoardGlobal][2][0];
+                }
+            }
+
+        }
+
+        return tab;
     }
-    public void play(String move){
+    public void play(String move,String player){
        String tab= moveConvertInt(move);
        char[] tab1= tab.toCharArray();
-        this.boardLocal[Character.getNumericValue( tab1[0])][Character.getNumericValue( tab1[1])][Character.getNumericValue( tab1[2])]=move;
+        this.boardLocal[Character.getNumericValue( tab1[0])][Character.getNumericValue( tab1[1])][Character.getNumericValue( tab1[2])]=player;
         //Evaluer le board Local apres avoir joué pour savoir s'il est gagné ou non
+        String [] Tab2=this.evaluateLocalBoard(Character.getNumericValue( tab1[0]));
 
+        if(Tab2[0]!=null||Tab2[1]!=null){
+            this.indiceLocalBoardComplete[Integer.parseInt(Tab2[0])]=Tab2[1];
+
+            for(int i=0; i<3;i++){
+                for(int j=0;j<3;j++){
+                    if(this.boardLocal[Integer.parseInt(Tab2[0])][i][j]=="-"){
+                        this.reserveMoveForUndo.add(Tab2[0]+i+j);
+                        this.availableMoves.remove(Tab2[0]+i+j);
+                    }
+                }
+
+            }
+        }
         //retirer le mov de la liste des moves available
         this.availableMoves.remove(tab);
     }
