@@ -8,7 +8,7 @@ public class Client1 {
         Socket MyClient;
         BufferedInputStream input;
         BufferedOutputStream output;
-        Plateau plateau = new Plateau();
+        final Plateau plateau = new Plateau();
 
         try {
             System.out.println("Veillez entré l'adresse du serveur: ");
@@ -31,13 +31,11 @@ public class Client1 {
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
-                    plateau = new Plateau();
                     plateau.setPlayers(cmd);
-                    plateau.printBoard();
                     String move = plateau.getNextMove("");;
-                    //System.out.println("-------------Le best Move est: "+move);
-                   // plateau.play(move, plateau.playerMax);
-
+                    System.out.println("-------------je dois jouer et envoyer au serveur: "+move);
+                    plateau.play(move, plateau.getPlayers().getCurrent());
+                    plateau.printBoard();
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
                 }
@@ -50,7 +48,6 @@ public class Client1 {
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
-                    plateau = new Plateau();
                     plateau.setPlayers(cmd);
                     plateau.printBoard();
                 }
@@ -63,20 +60,16 @@ public class Client1 {
                     int size = input.available();
                     input.read(aBuffer,0,size);
 
-                    String s = new String(aBuffer);
+                    String s = new String(aBuffer).trim();
                     System.out.println("Dernier coup :"+ s);
-                    //plateau.play(s.replaceAll("\\s", ""), plateau.playerMin);
+                    plateau.play(s.replaceAll("\\s", ""),plateau.getPlayers().getOppenent());
                     plateau.printBoard();
-                    System.out.println("Entrez votre coup : ");
-                    int alpha = Integer.MIN_VALUE;
-                    int beta = Integer.MAX_VALUE;
-
+                    System.out.println("........................................... ");
                     String move = plateau.getNextMove(s);;
                     System.out.println("-------------Le best Move est: "+move);
-                    //plateau.play(move);
-
-                    System.out.println("*********************** Plateau apres avoir obtenu le coup et apre avoir joué:  ");
+                    plateau.play(move, plateau.getPlayers().getCurrent());
                     plateau.printBoard();
+
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
                     //plateau.printPlateau();

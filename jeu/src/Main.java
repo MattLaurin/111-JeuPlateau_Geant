@@ -6,7 +6,9 @@ public class Main {
         Plateau plateau= new Plateau();
         Player joueur = new Player('1');
 
-        //plateau.play("A9");
+        plateau.play("H8", joueur.getCurrent());
+        plateau.play("D6", joueur.getCurrent());
+        plateau.play("B8", joueur.getCurrent());
         /*System.out.println("Move A1 en int :" + plateau.moveConvertInt("A1"));
         System.out.println("Move 0,0,0 en String :" + plateau.intConvertMove(0,0,0));
         System.out.println("Move 6,2,0 en String :" + plateau.intConvertMove(6,2,0));
@@ -14,10 +16,10 @@ public class Main {
         System.out.println("Move I1 en int :" + plateau.moveConvertInt("I1"));
         System.out.println("Move 8,2,2 en String :" + plateau.intConvertMove(8,2,2));*/
 
-        plateau.play("D3","X");
+        /*plateau.play("D3","X");
         plateau.play("E3","X");
-        plateau.play("F3","X");
-        plateau.generateMove("B1");
+        plateau.play("F3","X");*/
+        plateau.generateMove(" B8 ");
     
 
         plateau.printBoard();
