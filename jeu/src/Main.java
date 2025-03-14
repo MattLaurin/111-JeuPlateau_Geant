@@ -1,29 +1,14 @@
-import java.util.*;
-
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         Plateau plateau= new Plateau();
         Player joueur = new Player('1');
-        int nbTurns = 0;
-        char playerTurn;
 
-        while (!plateau.checkForGlobalWin()) {
-            if (nbTurns % 2 == 0) {
-                playerTurn = joueur.getCurrent();
-            } else {
-                playerTurn = joueur.getOppenent();
-            }
+        plateau.play("A9");
 
-            plateau.printBoard();
-            
-            plateau.playMove(playerTurn, scanner);
+        plateau.play("B1");
+        plateau.play("I1");
+        plateau.generateMove("B1");
 
-            plateau.checkForLocalWin();
-
-            nbTurns++;
-        }
-        
-        scanner.close();
+        plateau.printBoard();
     }
 }
