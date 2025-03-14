@@ -33,7 +33,7 @@ public class Client1 {
                     String s = new String(aBuffer).trim();
                     plateau = new Plateau();
                     plateau.setPlayers(cmd);
-                    plateau.printBoard();
+                    ////plateau.printboard();
                     String move = plateau.getNextMove("");;
                     //System.out.println("-------------Le best Move est: "+move);
                    // plateau.play(move, plateau.playerMax);
@@ -52,7 +52,7 @@ public class Client1 {
                     String s = new String(aBuffer).trim();
                     plateau = new Plateau();
                     plateau.setPlayers(cmd);
-                    plateau.printBoard();
+                    //plateau.printboard();
                 }
 
                 // Le serveur demande le prochain coup
@@ -66,7 +66,7 @@ public class Client1 {
                     String s = new String(aBuffer);
                     System.out.println("Dernier coup :"+ s);
                     //plateau.play(s.replaceAll("\\s", ""), plateau.playerMin);
-                    plateau.printBoard();
+                    //plateau.printboard();
                     System.out.println("Entrez votre coup : ");
                     int alpha = Integer.MIN_VALUE;
                     int beta = Integer.MAX_VALUE;
@@ -75,8 +75,8 @@ public class Client1 {
                     System.out.println("-------------Le best Move est: "+move);
                     plateau.play(move);
 
-                    System.out.println("*********************** Plateau apres avoir obtenu le coup et apre avoir joué:  ");
-                    plateau.printBoard();
+                    //System.out.println("*********************** Plateau apres avoir obtenu le coup et apre avoir joué:  ");
+                    //plateau.printboard();
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
                     //plateau.printPlateau();

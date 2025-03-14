@@ -19,6 +19,14 @@ public class Plateau {
         boardGlobal = new String[3][3];
         boardLocal = new String[9][3][3]; // 9 tableau de 3x3
 
+
+        // Initialize boardGlobal with empty strings
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                boardGlobal[i][j] = "-";
+            }
+        }
+
         for (int i = 0; i < 9; i++) {
             availableLocalBoards.add(i); // Ajoute chaque boards locaux dans la liste
             for (int row = 0; row < 3; row++) {
@@ -34,16 +42,31 @@ public class Plateau {
 
     // Ca sert a convertir A8 par 107 (Quel board jouer, la rangée et la colonne)
     public String moveConvertInt(String move) {
+        if (move.length() < 2) {
+            System.out.println("ERREUR: moveConvertInt() a reçu un move invalide: " + move);
+            return "-1";
+        }
+        move = move.trim().toUpperCase(); // S'assurer qu'il n'y a pas d'espace et que c'est en majuscule
         char lettreCol = move.charAt(0);
         int nbRow = Character.getNumericValue(move.charAt(1));
-    
-        int col = lettreCol - 'A'; // A-I  à 0-8
-        int row = 9 - nbRow; // 1 - 9 --> 0 - 8 
-    
-        int boardIndex = (row / 3) * 3 + (col / 3); // Ajustement pour savoir quel board jouer 
-        int localRow = row % 3; // 0-2
-        int localCol = col % 3; // 0-2
-    
+
+        if (nbRow < 1 || nbRow > 9) {
+            System.out.println("ERREUR: nbRow invalide = " + nbRow);
+            return "-1";
+        }
+
+        int col = lettreCol - 'A';
+        int row = 9 - nbRow;
+
+        if (col < 0 || col > 8 || row < 0 || row > 8) {
+            System.out.println("ERREUR: Colonne ou Ligne invalide");
+            return "-1";
+        }
+
+        int boardIndex = (row / 3) * 3 + (col / 3);
+        int localRow = row % 3;
+        int localCol = col % 3;
+
         return Integer.toString(boardIndex) + Integer.toString(localRow) + Integer.toString(localCol);
     }
 
@@ -56,77 +79,36 @@ public class Plateau {
         return Character.toString(colLetter) + Integer.toString(rowNumber); // Va transfer 1,0,7 en A8
     }
 
-    // Demande au joueur de faire son move et le retourne
-    /*private String askForMove(char player, Scanner scanner) {
-        System.out.println();
-        System.out.print("Joueur (" + player + ") faites votre move : ");
-        return scanner.nextLine();
-    }*/
+    
 
     // Retourne true si le move est legal
     private boolean isLegalMove(String move) {
-        if (move.length() != 2) {
-            return false;
-        }
-
-        char lettre = move.charAt(0);
-        char chiffre = move.charAt(1);
-
-        // Vérifie si la lettre est entre A et I et le chiffre entre 1 et 9
-        if (lettre >= 'A' && lettre <= 'I' && Character.isDigit(chiffre)) {
-            int chiffreInt = Character.getNumericValue(chiffre);
-            if (chiffreInt >= 1 && chiffreInt <= 9) {
-                // Vérifie si le mouvement est dans la liste des mouvements disponibles
-                return availableMoves.contains(moveConvertInt(move));
-            }
-        }
-
+    if (move.length() != 2) {
         return false;
     }
 
-    // Fonction pour jouer un move
-    /*public void playMove(char c, Scanner scanner) {
-        String move = askForMove(c, scanner);
+    char lettre = move.charAt(0);
+    char chiffre = move.charAt(1);
 
-        while (!isLegalMove(move)) {
-            System.out.println("MOVE ILLEGAL : " + move);
-            move = askForMove(c, scanner);
-        }
-        availableMoves.remove(moveConvertInt(move));
-
-        String convertedMove = moveConvertInt(move);
-        System.out.println(
-                "MOVE : " + convertedMove.charAt(0) + " " + convertedMove.charAt(1) + " " + convertedMove.charAt(2));
-        boardLocal[convertedMove.charAt(0) - '0'][convertedMove.charAt(1) - '0'][convertedMove.charAt(2)
-                - '0'] = Character.toString(c);
-        System.out.println();
-    }
-
-    // Dessine un X ou O dans une partie locale lorsqu'elle est gagnee
-    public void updateLocalBoardOnWin(int boardIndex, char player) {
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                boardLocal[boardIndex][row][col] = Character.toString(player);
+    // Vérifie si la lettre est entre A et I et le chiffre entre 1 et 9
+    if (lettre >= 'A' && lettre <= 'I' && Character.isDigit(chiffre)) {
+        int chiffreInt = Character.getNumericValue(chiffre);
+        if (chiffreInt >= 1 && chiffreInt <= 9) {
+            // Vérifie si le mouvement est dans la liste des mouvements disponibles
+            String convertedMove = moveConvertInt(move);
+            int boardIndex = Character.getNumericValue(convertedMove.charAt(0));
+            if (indiceLocalBoardComplete[boardIndex] == null && availableMoves.contains(convertedMove)) {
+                return true;
             }
         }
-
-    }
-a
-    // Retourne vrai si un joueur a gagne une partie locale
-    public boolean checkForLocalWin() {
-        for (int i = 0; i < 9; i++) {
-            if (availableLocalBoards.contains(i)) {
-            }
-        }
-        return false;
     }
 
-    // Retourne vrai si un joeur a gagne la partie globale
-    public boolean checkForGlobalWin() {
-        return false;
-    }*/
+    return false;
+}
 
-    // Modifier mais a revoir (17:45)
+    
+
+    
     public String getNextMove(String lastMove){
         int bestValue = Integer.MIN_VALUE;
     String bestMove = null;
@@ -135,11 +117,11 @@ a
     ArrayList<String> moveDispo = generateMove(lastMove);
 
     for (String move : moveDispo) {
-        play(move); // Simulate move
+        play(move); // Simuler le move 
         int moveValue = MiniMaxAb(3, false, currentPlayer, opponent, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        undoMove(move); // Undo move after
+        undoMove(move); // Undo move apres (essai erreur)
 
-        if (moveValue > bestValue) {
+        if (moveValue > bestValue) { 
             bestMove = move;
             bestValue = moveValue;
         }
@@ -147,18 +129,16 @@ a
     return bestMove;
     }
 
-    //
-    // MODIFICATION 17:32 matt (MINMAX DE L'AUTRE LAB)
-    //
+   
     private int MiniMaxAb(int depth, boolean isMaximising, char player, char opponent, int alpha, int beta) {
         int boardValue = evaluateForMinMax();
         if (Math.abs(boardValue) == 100 || availableMoves.isEmpty() || depth == 0) {
             return boardValue;
         }
-
-        if (isMaximising) { // AI turn
+        if (isMaximising) { // Tour du AI
             int maxEval = Integer.MIN_VALUE;
             for (String move : availableMoves) {
+                if (!isLegalMove(move)) continue; // Skip les moves invalid
                 play(move);
                 int eval = MiniMaxAb(depth - 1, false, player, opponent, alpha, beta);
                 undoMove(move);
@@ -167,9 +147,10 @@ a
                 if (beta <= alpha) break; // L'elagage
             }
             return maxEval;
-        } else { // Opponent's turn
+        } else { // Tour de l'enemi
             int minEval = Integer.MAX_VALUE;
             for (String move : availableMoves) {
+                if (!isLegalMove(move)) continue; // Skip les moves invalid
                 play(move);
                 int eval = MiniMaxAb(depth - 1, true, player, opponent, alpha, beta);
                 undoMove(move);
@@ -181,60 +162,113 @@ a
         }
     }
 
-     //
-    // MODIFICATION 17:32 matt (MINMAX DE L'AUTRE LAB)
-    //
     public void undoMove(String move) {
         String tab = moveConvertInt(move);
-        char[] tab1 = tab.toCharArray();
-        this.boardLocal[Character.getNumericValue(tab1[0])][Character.getNumericValue(tab1[1])][Character.getNumericValue(tab1[2])] = "-";
-
-        // Add le move au truc possible vu qu'on la "undo"
-        this.availableMoves.add(tab);
-    }
-    //
-    // MODIFICATION 17:32 matt
-    //
-
-
-
-    private int evaluateForMinMax(){
-        return 0; // doit retourner 100 -100 ou 0
-    }
-
-
-    public void play(String move){
-       String tab= moveConvertInt(move);
-       char[] tab1= tab.toCharArray();
-        this.boardLocal[Character.getNumericValue( tab1[0])][Character.getNumericValue( tab1[1])][Character.getNumericValue( tab1[2])]=move;
-
-        //retirer le mov de la liste des moves available
-        this.availableMoves.remove(tab);
-    }
-    public ArrayList<String> generateMove(String Move){
-        if(Move.isEmpty()){
-            return this.availableMoves;
-        }else{
-            int tableLocal=returnGlobalCase(Move);
-
-            if(indiceLocalBoardComplete[tableLocal]!=null){
-
-                return this.availableMoves;
-            }else{
-                ArrayList<String> tabMoveAvailable = new ArrayList<String>();
-                for(int i=0;i<3;i++){
-                    for(int j=0;j<3;j++){
-                        if(boardLocal[tableLocal][i][j]=="-"){
-                            tabMoveAvailable.add( intConvertMove(tableLocal,i,j));
-                        }
-                    }
-                }
-                return tabMoveAvailable;
-            }
+        if (tab.equals("-1")) {
+            System.out.println("ERREUR: undoMove() a reçu un move invalide: " + move);
+            return;
         }
 
-
+        char[] tab1 = tab.toCharArray();
+        int boardIndex = Character.getNumericValue(tab1[0]);
+        int row = Character.getNumericValue(tab1[1]);
+        int col = Character.getNumericValue(tab1[2]);
+    
+        boardLocal[boardIndex][row][col] = "-";
+        availableMoves.add(tab);
     }
+    
+
+
+
+
+    private int evaluateForMinMax() {
+        // Check rows for victory
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (boardGlobal[i][j].equals("X")) {
+                    return 100; // AI wins
+                } else if (boardGlobal[i][j].equals("O")) {
+                    return -100; // Opponent wins
+                }
+            }
+        }
+    
+        // Check columns for victory
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (boardGlobal[j][i].equals("X")) {
+                    return 100; // AI wins
+                } else if (boardGlobal[j][i].equals("O")) {
+                    return -100; // Opponent wins
+                }
+            }
+        }
+    
+        // Check diagonals for victory
+        if (boardGlobal[0][0].equals("X") && boardGlobal[1][1].equals("X") && boardGlobal[2][2].equals("X")) {
+            return 100; // AI wins
+        } else if (boardGlobal[0][0].equals("O") && boardGlobal[1][1].equals("O") && boardGlobal[2][2].equals("O")) {
+            return -100; // Opponent wins
+        }
+    
+        if (boardGlobal[0][2].equals("X") && boardGlobal[1][1].equals("X") && boardGlobal[2][0].equals("X")) {
+            return 100; // AI wins
+        } else if (boardGlobal[0][2].equals("O") && boardGlobal[1][1].equals("O") && boardGlobal[2][0].equals("O")) {
+            return -100; // Opponent wins
+        }
+    
+        // If no one has won, return 0
+        return 0;
+    }
+
+
+    public void play(String move) {
+        String tab = moveConvertInt(move);
+        if (tab.equals("-1")) {
+            System.out.println("ERREUR: play() a reçu un move invalide: " + move);
+            return;
+        }
+        char[] tab1 = tab.toCharArray();
+        int boardIndex = Character.getNumericValue(tab1[0]);
+        int row = Character.getNumericValue(tab1[1]);
+        int col = Character.getNumericValue(tab1[2]);
+    
+        boardLocal[boardIndex][row][col] = String.valueOf(player.getCurrent());
+        availableMoves.remove(tab);
+    }
+
+
+    public ArrayList<String> generateMove(String move) {
+    if (move.isEmpty()) {
+        return this.availableMoves;
+    } else {
+        int tableLocal = returnGlobalCase(move);
+
+        if (indiceLocalBoardComplete[tableLocal] != null) {
+            // Senser verifier si le local board est complketer 
+            // CA ICI CA SEMBLE PAS MARCHER
+            ArrayList<String> validMoves = new ArrayList<>();
+            for (String availableMove : availableMoves) {
+                int boardIndex = Character.getNumericValue(availableMove.charAt(0));
+                if (indiceLocalBoardComplete[boardIndex] == null) {
+                    validMoves.add(availableMove);
+                }
+            }
+            return validMoves;
+        } else {
+            ArrayList<String> tabMoveAvailable = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (boardLocal[tableLocal][i][j].equals("-")) {
+                        tabMoveAvailable.add(intConvertMove(tableLocal, i, j));
+                    }
+                }
+            }
+            return tabMoveAvailable;
+        }
+    }
+}
 
     /**
      * returne un nombre de 0 a 8 qui equivaut a la table local ou jouer le coup
@@ -242,19 +276,21 @@ a
      * @return
      */
     public int returnGlobalCase(String move){
-        String tab= moveConvertInt(move);
-        char[] tab1= tab.toCharArray();
-
-        if(Character.getNumericValue(tab1[1])==0){
-            return Character.getNumericValue(tab1[2]);
-        }else if(Character.getNumericValue(tab1[1])==1){
-            return Character.getNumericValue(tab1[2])+3;
-        }else if(Character.getNumericValue(tab1[1])==2){
-            return Character.getNumericValue(tab1[2])+6;
-        }
-
-        return -1;
+        String tab = moveConvertInt(move);
+        
+    
+        char[] tab1 = tab.toCharArray();
+        int rowIndex = Character.getNumericValue(tab1[1]);
+        int colIndex = Character.getNumericValue(tab1[2]);
+    
+        int boardIndex = (rowIndex * 3) + colIndex;  // Fix calcul
+    
+        return boardIndex;
     }
+
+    
+
+
     public void setPlayers(char c){
         this.player = new Player(c);
     }
