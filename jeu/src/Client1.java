@@ -67,9 +67,6 @@ public class Client1 {
                     System.out.println("Dernier coup :"+ s);
                     //plateau.play(s.replaceAll("\\s", ""), plateau.playerMin);
                     //plateau.printboard();
-                    System.out.println("Entrez votre coup : ");
-                    int alpha = Integer.MIN_VALUE;
-                    int beta = Integer.MAX_VALUE;
 
                     String move = plateau.getNextMove(s);;
                     System.out.println("-------------Le best Move est: "+move);
