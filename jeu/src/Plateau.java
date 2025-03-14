@@ -397,9 +397,7 @@ public class Plateau {
             int tableLocal=returnGlobalCase(Move);
 
             if(indiceLocalBoardComplete[tableLocal]!=null){
-                if(availableMoves.size()==0){
-                    int s=0;
-                }
+
                 return this.availableMoves.clone();
             }else{
                 ArrayList<String> tabMoveAvailable = new ArrayList<String>();
