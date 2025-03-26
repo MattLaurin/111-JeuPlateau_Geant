@@ -8,10 +8,10 @@ public class Client1 {
         Socket MyClient;
         BufferedInputStream input;
         BufferedOutputStream output;
-        Plateau plateau = new Plateau();
+        final Plateau plateau = new Plateau();
 
         try {
-            System.out.println("Veillez entré l'adresse du serveur: ");
+            System.out.println("Veuillez entré l'adresse du serveur: ");
 
             MyClient = new Socket("localhost", 8888);
 
@@ -23,20 +23,21 @@ public class Client1 {
                 cmd = (char)input.read();
                 System.out.println(cmd);
 
-                // Debut de la partie en joueur blanc
+                // Debut de la partie en joueur Rouge
                 if(cmd == '1'){
-                    System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
+                    System.out.println("Nouvelle partie! Vous jouer Rouge, entrez votre premier coup : ");
                     byte[] aBuffer = new byte[1024];
                     int size = input.available();
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
-                    plateau = new Plateau();
                     plateau.setPlayers(cmd);
-                    ////plateau.printboard();
-                    String move = plateau.getNextMove("");;
-                    //System.out.println("-------------Le best Move est: "+move);
-                   // plateau.play(move, plateau.playerMax);
+
+                    String move = plateau.getNextMove(""); // ICI PROBLEME 
+                    System.out.println("Le move jouer est : " + move);
+                    
+                    plateau.play(move, plateau.getPlayers().getCurrent());
+                    plateau.printBoard();
 
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
@@ -50,9 +51,8 @@ public class Client1 {
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
-                    plateau = new Plateau();
                     plateau.setPlayers(cmd);
-                    //plateau.printboard();
+                    plateau.printBoard();
                 }
 
                 // Le serveur demande le prochain coup
@@ -63,20 +63,19 @@ public class Client1 {
                     int size = input.available();
                     input.read(aBuffer,0,size);
 
-                    String s = new String(aBuffer);
-                    System.out.println("Dernier coup :"+ s);
-                    //plateau.play(s.replaceAll("\\s", ""), plateau.playerMin);
-                    //plateau.printboard();
-
+                    String s = new String(aBuffer).trim();
+                    System.out.println("Dernier coup reçu du serveur : " + s + " (length: " + s.length() + ")");
+                    plateau.play(s.replaceAll("\\s", ""),plateau.getPlayers().getOpponent());
+                    plateau.printBoard();
+                    
                     String move = plateau.getNextMove(s);;
                     System.out.println("-------------Le best Move est: "+move);
-                    plateau.play(move);
+                    plateau.play(move, plateau.getPlayers().getCurrent());
+                    plateau.printBoard();
 
-                    //System.out.println("*********************** Plateau apres avoir obtenu le coup et apre avoir joué:  ");
-                    //plateau.printboard();
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
-                    //plateau.printPlateau();
+                    
                 }
 
                 // Le dernier coup est invalide

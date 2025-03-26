@@ -1,24 +1,24 @@
 public class Player {
-    private char current;
-    private char oppenent;
+    private String current;
+    private String opponent;
 
     public Player(char i){
         if(i=='1'){
-            this.current='O'; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
-            this.oppenent='X';
+            this.current="X"; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
+            this.opponent="O";
         }else{
-            this.current='X'; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
-            this.oppenent='O';
+            this.current="O"; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
+            this.opponent="X";
         }
 
     }
 
-    public char getCurrent() {
+    public String getCurrent() {
         return current;
     }
 
-    public char getOppenent() {
-        return oppenent;
+    public String getOpponent() {
+        return opponent;
     }
 
     public String getNonValue(String c){
