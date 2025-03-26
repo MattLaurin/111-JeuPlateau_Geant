@@ -76,18 +76,8 @@ public class MiniMax {
             score = heuristic;
         }
 
-        // Adaptive depth based on game progression
-        int filledCells = 0;
-        for (int i = 0; i < 9; i++) {
-            String[][] grid = plateau.getLocalBoard(i).getBoard();
-            for (int r = 0; r < 3; r++)
-                for (int c = 0; c < 3; c++)
-                    if (!grid[r][c].equals("-")) filledCells++;
-        }
 
         int maxDepth = 6;
-        //int adaptiveDepth = (filledCells < 27) ? 6 : maxDepth;
-
         if (Math.abs(score) >= 100000 || plateau.isGameOver() || depth == maxDepth) {
             return score - depth;
         }

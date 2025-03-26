@@ -16,7 +16,7 @@ public class Tester {
         //ArrayList<String> moveAvailable  = Algo.generateMove("E8", plateau, plateau.returnGlobalCase("E8"));
         
         System.out.println("Forced board index : " + plateau.returnGlobalCase("E8"));
-        /System.out.println("Evaluating possible moves:" + moveAvailable);
+        //System.out.println("Evaluating possible moves:" + moveAvailable);
 
         plateau.play("E8", joueur.getCurrent());
         plateau.printBoard();
