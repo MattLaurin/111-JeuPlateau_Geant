@@ -38,7 +38,7 @@ public class Algo {
         String opponent = player.getOpponent();
         int score = 0;
     
-        // Precomputed weights for strategic positions
+        // Un poids pour les cases, initialiser d'avance pour eviter de calculer a chaque fois.
         int[][] weights = {
             {3, 2, 3},
             {2, 4, 2},
@@ -62,7 +62,7 @@ public class Algo {
                 if (board[j][i].equals(currentPlayer)) playerCol++;
                 else if (board[j][i].equals(opponent)) opponentCol++;
     
-                // Add weighted score for individual cells
+                // Points pour 'chaque' case 
                 if (board[i][j].equals(currentPlayer)) score += weights[i][j];
                 else if (board[i][j].equals(opponent)) score -= weights[i][j];
             }
@@ -106,13 +106,13 @@ public class Algo {
             } else {
                 globalBoard[i] = "-";
     
-                // Use local evaluation as a proxy for potential win
+                // Call localEval pour balancer le choix
                 int localEval = evaluateLocal(local, player);
-                score += localEval * globalWeights[i]; // Weighted based on position
+                score += localEval * globalWeights[i]; // Poids en fonction de la position
             }
         }
     
-        // Check line formations
+        // Sert a evaluer les lignes 
         int[][] lines = {
             {0, 1, 2}, {3, 4, 5}, {6, 7, 8},
             {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
@@ -120,7 +120,7 @@ public class Algo {
         };
     
         for (int[] line : lines) {
-            int playerCount = 0, opponentCount = 0;
+            int playerCount = 0, opponentCount = 0; // Compte le nb de win etc. (Aka l'euristique)
     
             for (int idx : line) {
                 if (globalBoard[idx].equals(currentPlayer)) playerCount++;

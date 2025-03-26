@@ -13,8 +13,11 @@ public class MiniMax {
         ArrayList<String> moveDispo;
         int forcedBoardIndex=0;
 
+        // Pour garder en tete le nb de move : 
+        plateau.recalculateFilledCells();
+
         if(move.equals("")){
-            moveDispo = Algo.generateMove(move, plateau, 0);
+            moveDispo = Algo.generateMove(move, plateau, -1);
         }else{
             forcedBoardIndex = plateau.returnGlobalCase(move);
             moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
@@ -30,15 +33,15 @@ public class MiniMax {
             int oppForcedBoard = plateau.returnGlobalCase(m);
             int baseVal = minimax(0, false, Integer.MIN_VALUE, Integer.MAX_VALUE, plateau, m, oppForcedBoard);
 
-            // Strategic forcing bonus
+            // Force bonus pour max la strat
             int boardControlScore = 0;
             if (oppForcedBoard >= 0 && oppForcedBoard < 9 && !plateau.getWonLocalBoards().contains(oppForcedBoard)) {
                 boardControlScore = Algo.evaluateLocal(plateau.getLocalBoard(oppForcedBoard), player);
             } else if (plateau.getWonLocalBoards().contains(oppForcedBoard)) {
-                boardControlScore = 120; // Boosted for better forcing
+                boardControlScore = 120; // Boost pcq c'est le best presque tjrs
             }
 
-            // Bonus: Opening move logic
+            // Bonus: Move opening (C ca le best move)
             int openingBonus = 0;
             if (plateau.getWonLocalBoards().isEmpty()) {
                 if (m.equals("E5")) openingBonus = 1000; // center
@@ -76,17 +79,16 @@ public class MiniMax {
             score = heuristic;
         }
 
-        // Adaptive depth based on game progression
-        int filledCells = 0;
-        for (int i = 0; i < 9; i++) {
-            String[][] grid = plateau.getLocalBoard(i).getBoard();
-            for (int r = 0; r < 3; r++)
-                for (int c = 0; c < 3; c++)
-                    if (!grid[r][c].equals("-")) filledCells++;
+        int filledCells = plateau.getFilledCellNb();
+        
+        int maxDepth = 6;
+        if (filledCells == 0){
+            System.out.println("First move");
+            maxDepth = 3;
+        }else if (filledCells < 5){
+            maxDepth = 5;
         }
 
-        //int adaptiveDepth = (filledCells < 27) ? 6 : 7;
-        int maxDepth = 6;
 
         if (Math.abs(score) >= 100000 || plateau.isGameOver() || depth == maxDepth) {
             return score - depth;

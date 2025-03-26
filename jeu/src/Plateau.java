@@ -16,6 +16,8 @@ public class Plateau{
     public Boolean GlobalIsWon = false; // Partie terminée 
     public List<Integer> wonLocalBoards = new ArrayList<>(); // LocalBoard gagnés
 
+    //--------Var pour Eval--------//
+    private int filledCellCount = 0;
 
      //--------Code Conditions de jeu--------//
      /**
@@ -116,6 +118,24 @@ public class Plateau{
    
     return targetBoard;
 }
+
+    public int getFilledCellNb(){ // Retourne le nb de "move" jouer
+        return filledCellCount;
+    }
+
+    public void recalculateFilledCells(){
+        filledCellCount = 0;
+        for (int i =0; i<nbPlateau; i++){
+            String[][] board = globalBoard.get(i).getBoard();
+            for (int j = 0; j < nbRow; j++){
+                for (int k = 0; k < nbCol; k++){
+                    if (!board[j][k].equals("-")){
+                        filledCellCount++;
+                    }
+                }
+            }
+        }
+    }
 
 
     //--------Partie Jeu--------//
