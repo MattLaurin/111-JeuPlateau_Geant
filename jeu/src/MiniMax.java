@@ -9,8 +9,17 @@ public class MiniMax {
     }
 
     public String getNextMove(String move, Plateau plateau) {
-        int forcedBoardIndex = plateau.returnGlobalCase(move);
-        ArrayList<String> moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
+
+        ArrayList<String> moveDispo;
+        int forcedBoardIndex=0;
+
+        if(move.equals("")){
+            moveDispo = Algo.generateMove(move, plateau, 0);
+        }else{
+            forcedBoardIndex = plateau.returnGlobalCase(move);
+            moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
+        }
+        
 
         int bestVal = Integer.MIN_VALUE;
         String bestMove = "";
@@ -21,15 +30,23 @@ public class MiniMax {
             int oppForcedBoard = plateau.returnGlobalCase(m);
             int baseVal = minimax(0, false, Integer.MIN_VALUE, Integer.MAX_VALUE, plateau, m, oppForcedBoard);
 
-            // Strategic forcing bonus (pour max la win)
+            // Strategic forcing bonus
             int boardControlScore = 0;
             if (oppForcedBoard >= 0 && oppForcedBoard < 9 && !plateau.getWonLocalBoards().contains(oppForcedBoard)) {
                 boardControlScore = Algo.evaluateLocal(plateau.getLocalBoard(oppForcedBoard), player);
             } else if (plateau.getWonLocalBoards().contains(oppForcedBoard)) {
-                boardControlScore = 75;
+                boardControlScore = 120; // Boosted for better forcing
             }
 
-            int totalVal = baseVal + boardControlScore;
+            // Bonus: Opening move logic
+            int openingBonus = 0;
+            if (plateau.getWonLocalBoards().isEmpty()) {
+                if (m.equals("E5")) openingBonus = 1000; // center
+                else if ("A1 A9 I1 I9".contains(m)) openingBonus = 800; // corners
+                else if ("A5 E1 E9 I5".contains(m)) openingBonus = 500; // edges
+            }
+
+            int totalVal = baseVal + boardControlScore + openingBonus;
 
             if (totalVal > bestVal) {
                 bestVal = totalVal;
@@ -46,6 +63,7 @@ public class MiniMax {
         return bestMove;
     }
 
+
     // Minimax Algorithm with et elagage Alpha-Beta 
     private int minimax(int depth, boolean isMax, int alpha, int beta, Plateau plateau, String lastMove, int forcedBoardIndex) {
         int score = Algo.evaluateGlobal(plateau, player);
@@ -58,7 +76,19 @@ public class MiniMax {
             score = heuristic;
         }
 
-        if (Math.abs(score) >= 100000 || plateau.isGameOver() || depth == 6) {
+        // Adaptive depth based on game progression
+        int filledCells = 0;
+        for (int i = 0; i < 9; i++) {
+            String[][] grid = plateau.getLocalBoard(i).getBoard();
+            for (int r = 0; r < 3; r++)
+                for (int c = 0; c < 3; c++)
+                    if (!grid[r][c].equals("-")) filledCells++;
+        }
+
+        int maxDepth = 6;
+        //int adaptiveDepth = (filledCells < 27) ? 6 : maxDepth;
+
+        if (Math.abs(score) >= 100000 || plateau.isGameOver() || depth == maxDepth) {
             return score - depth;
         }
 
