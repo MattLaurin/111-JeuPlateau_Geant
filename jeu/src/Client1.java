@@ -66,13 +66,16 @@ public class Client1 {
                     plateau.printBoard();
                     System.out.println("........................................... ");
                     String move = plateau.getNextMove(s);;
+                    if(move.equals("A9")){
+                        int i=0;
+                    }
                     System.out.println("-------------Le best Move est: "+move);
                     plateau.play(move, plateau.getPlayers().getCurrent());
                     plateau.printBoard();
 
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
-                    //plateau.printPlateau();
+
                 }
 
                 // Le dernier coup est invalide

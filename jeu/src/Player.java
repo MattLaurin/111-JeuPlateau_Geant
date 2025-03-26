@@ -3,7 +3,7 @@ public class Player {
     private String oppenent;
 
     public Player(char i){
-        if(i=='1'){
+        if(i=='2'){
             this.current="O"; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
             this.oppenent="X";
         }else{

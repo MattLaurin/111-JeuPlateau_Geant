@@ -94,10 +94,6 @@ public class Plateau {
             }
         }
 
-        if(bestMove.equals("")){
-            int o=0;
-        }
-
         //return moveDispo.get(0);
         return bestMove;
 
@@ -106,33 +102,29 @@ public class Plateau {
     private int minimax(int depth, boolean isMax, int alpha, int beta) {
         int score = evaluate();
 
-        if (score == 10 || score == -10 || isGameOver()||depth==3) return score - depth;
+        if (score == 10 || score == -10 || isGameOver()||depth==10) return score - depth;
         ArrayList<String> listeMovesAvailables = new ArrayList<>();
 
-        if (isMax) { // Tour de l'IA (Maximisation)
+        if (isMax) {
             int best = Integer.MIN_VALUE;
             for (String me : listeMovesAvailables) {
                 play(me, player.getCurrent());
-                printBoard();
                 best = Math.max(best, minimax(depth + 1, false, alpha, beta));
                 undo(me);
                 System.out.print("Board after undo");
-                printBoard();
                 alpha = Math.max(alpha, best);
                 if (beta <= alpha) return best; // Élagage
             }
 
 
             return best;
-        } else { // Tour du joueur (Minimisation)
+        } else {
             int best = Integer.MAX_VALUE;
             for (String ma:listeMovesAvailables) {
                 play(ma, player.getOppenent());
-                printBoard();
                 best = Math.min(best, minimax(depth + 1, true, alpha, beta));
                 undo(ma);
                 System.out.print("Board after undo");
-                printBoard();
                 beta = Math.min(beta, best);
                 if (beta <= alpha) return best; // Élagage
 
@@ -288,10 +280,6 @@ public class Plateau {
 
         }
 
-
-       /* if(tab[1].equals("-")){
-            int y=0;
-        }*/
         return tab;
     }
     /*public void undo(String mm){
@@ -342,6 +330,7 @@ public class Plateau {
 
             // ✅ Annuler la victoire locale du joueur
             this.indiceLocalBoardComplete[localBoardIndex] = null;
+            //printBigBoard();
         }
     }
 
@@ -368,6 +357,8 @@ public class Plateau {
         try{
             if(Tab2[0]!=null||Tab2[1]!=null){
                 this.indiceLocalBoardComplete[Integer.parseInt(Tab2[0])]=Tab2[1];
+               // printBigBoard();
+
 
                 for(int i=0; i<3;i++){
                     for(int j=0;j<3;j++){
@@ -388,9 +379,7 @@ public class Plateau {
         this.availableMoves.remove(move);
     }
     public Object generateMove(String Move){
-        if(Move.equals("I9")){
-            int y=0;
-        }
+
         if(Move==""){
             return this.availableMoves.clone();
         }else{
@@ -461,5 +450,13 @@ public class Plateau {
         }
         System.out.println("  -----------------------");
         System.out.println("    A B C   D E F   G H I");
+    }
+
+    public void printBigBoard(){
+        System.out.println("les élements du tableau a 9 valeurs sont: ");
+        for(String u :indiceLocalBoardComplete){
+            System.out.println(u);
+        }
+        System.out.println("Fin des élements.............");
     }
 }
