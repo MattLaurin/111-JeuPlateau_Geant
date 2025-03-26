@@ -4,11 +4,11 @@ public class Player {
 
     public Player(char i){
         if(i=='1'){
-            this.current="O"; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
-            this.opponent="X";
-        }else{
             this.current="X"; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
             this.opponent="O";
+        }else{
+            this.current="O"; //la premiere valeur de la string venu du serveur est le choix de notre champ ( soit rouge, soit noir)
+            this.opponent="X";
         }
 
     }

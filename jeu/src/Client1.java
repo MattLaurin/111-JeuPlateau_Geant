@@ -33,7 +33,7 @@ public class Client1 {
                     String s = new String(aBuffer).trim();
                     plateau.setPlayers(cmd);
 
-                    String move = plateau.getNextMove("");
+                    String move = plateau.getNextMove(""); // ICI PROBLEME 
                     System.out.println("Le move jouer est : " + move);
                     
                     plateau.play(move, plateau.getPlayers().getCurrent());

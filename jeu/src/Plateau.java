@@ -99,6 +99,7 @@ public class Plateau{
      //--------Lien avec Eval--------//
 
    public int returnGlobalCase(String move) {
+    
     String tab = Algo.moveConvertInt(move);
     
     if (tab.length() != 3) {

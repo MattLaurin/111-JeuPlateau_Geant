@@ -32,105 +32,110 @@ public class Algo {
 
     //--------Code Eval--------//
 
-public static int evaluateLocal(LocalBoard localBoard, Player player) {
-    String[][] board = localBoard.getBoard();
-    String currentPlayer = player.getCurrent();
-    String opponent = player.getOpponent();
-    int score = 0;
-
-    // Precompute weights for faster access
-    int[][] weights = {
-        {3, 2, 3},
-        {2, 4, 2},
-        {3, 2, 3}
-    };
-
-    // Evaluate rows, columns, and diagonals in a single pass
-    for (int i = 0; i < 3; i++) {
-        int playerRow = 0, opponentRow = 0;
-        int playerCol = 0, opponentCol = 0;
-
-        for (int j = 0; j < 3; j++) {
-            // Row evaluation
-            if (board[i][j].equals(currentPlayer)) playerRow++;
-            else if (board[i][j].equals(opponent)) opponentRow++;
-
-            // Column evaluation
-            if (board[j][i].equals(currentPlayer)) playerCol++;
-            else if (board[j][i].equals(opponent)) opponentCol++;
-
-            // Add weighted score for individual cells
-            if (board[i][j].equals(currentPlayer)) score += weights[i][j];
-            else if (board[i][j].equals(opponent)) score -= weights[i][j];
+    public static int evaluateLocal(LocalBoard localBoard, Player player) {
+        String[][] board = localBoard.getBoard();
+        String currentPlayer = player.getCurrent();
+        String opponent = player.getOpponent();
+        int score = 0;
+    
+        // Precomputed weights for strategic positions
+        int[][] weights = {
+            {3, 2, 3},
+            {2, 4, 2},
+            {3, 2, 3}
+        };
+    
+        // Evaluate rows, columns, and diagonals
+        int playerDiag1 = 0, opponentDiag1 = 0;
+        int playerDiag2 = 0, opponentDiag2 = 0;
+    
+        for (int i = 0; i < 3; i++) {
+            int playerRow = 0, opponentRow = 0;
+            int playerCol = 0, opponentCol = 0;
+    
+            for (int j = 0; j < 3; j++) {
+                // Row evaluation
+                if (board[i][j].equals(currentPlayer)) playerRow++;
+                else if (board[i][j].equals(opponent)) opponentRow++;
+    
+                // Column evaluation
+                if (board[j][i].equals(currentPlayer)) playerCol++;
+                else if (board[j][i].equals(opponent)) opponentCol++;
+    
+                // Add weighted score for individual cells
+                if (board[i][j].equals(currentPlayer)) score += weights[i][j];
+                else if (board[i][j].equals(opponent)) score -= weights[i][j];
+            }
+    
+            // Add scores for rows and columns
+            if (playerRow > 0 && opponentRow == 0) score += playerRow * 10;
+            if (opponentRow > 0 && playerRow == 0) score -= opponentRow * 10;
+            if (playerCol > 0 && opponentCol == 0) score += playerCol * 10;
+            if (opponentCol > 0 && playerCol == 0) score -= opponentCol * 10;
+    
+            // Diagonal evaluation
+            if (board[i][i].equals(currentPlayer)) playerDiag1++;
+            else if (board[i][i].equals(opponent)) opponentDiag1++;
+            if (board[i][2 - i].equals(currentPlayer)) playerDiag2++;
+            else if (board[i][2 - i].equals(opponent)) opponentDiag2++;
         }
-
-        // Add scores for rows and columns
-        if (playerRow > 0 && opponentRow == 0) score += playerRow * 10;
-        if (opponentRow > 0 && playerRow == 0) score -= opponentRow * 10;
-        if (playerCol > 0 && opponentCol == 0) score += playerCol * 10;
-        if (opponentCol > 0 && playerCol == 0) score -= opponentCol * 10;
+    
+        // Add scores for diagonals
+        if (playerDiag1 > 0 && opponentDiag1 == 0) score += playerDiag1 * 10;
+        if (opponentDiag1 > 0 && playerDiag1 == 0) score -= opponentDiag1 * 10;
+        if (playerDiag2 > 0 && opponentDiag2 == 0) score += playerDiag2 * 10;
+        if (opponentDiag2 > 0 && playerDiag2 == 0) score -= opponentDiag2 * 10;
+    
+        return score;
     }
 
-    // Evaluate diagonals
-    int playerDiag1 = 0, opponentDiag1 = 0;
-    int playerDiag2 = 0, opponentDiag2 = 0;
-
-    for (int i = 0; i < 3; i++) {
-        if (board[i][i].equals(currentPlayer)) playerDiag1++;
-        else if (board[i][i].equals(opponent)) opponentDiag1++;
-
-        if (board[i][2 - i].equals(currentPlayer)) playerDiag2++;
-        else if (board[i][2 - i].equals(opponent)) opponentDiag2++;
-    }
-
-    if (playerDiag1 > 0 && opponentDiag1 == 0) score += playerDiag1 * 10;
-    if (opponentDiag1 > 0 && playerDiag1 == 0) score -= opponentDiag1 * 10;
-    if (playerDiag2 > 0 && opponentDiag2 == 0) score += playerDiag2 * 10;
-    if (opponentDiag2 > 0 && playerDiag2 == 0) score -= opponentDiag2 * 10;
-
-    return score;
-}
 
 
-
-public static int evaluateGlobal(Plateau plateau, Player player) {
-    String[] globalBoard = new String[9];
-    for (int i = 0; i < 9; i++) {
-        if (plateau.getWonLocalBoards().contains(i)) {
-            globalBoard[i] = plateau.getLocalBoard(i).getWinner();
-        } else {
-            globalBoard[i] = "-";
+    public static int evaluateGlobal(Plateau plateau, Player player) {
+        String currentPlayer = player.getCurrent();
+        String opponent = player.getOpponent();
+        int score = 0;
+    
+        int[] globalWeights = {3, 2, 3, 2, 5, 2, 3, 2, 3};
+        String[] globalBoard = new String[9];
+    
+        for (int i = 0; i < 9; i++) {
+            LocalBoard local = plateau.getLocalBoard(i);
+            if (plateau.getWonLocalBoards().contains(i)) {
+                globalBoard[i] = local.getWinner();
+            } else {
+                globalBoard[i] = "-";
+    
+                // Use local evaluation as a proxy for potential win
+                int localEval = evaluateLocal(local, player);
+                score += localEval * globalWeights[i]; // Weighted based on position
+            }
         }
-    }
-
-    String currentPlayer = player.getCurrent();
-    String opponent = player.getOpponent();
-    int score = 0;
-
-    // Evaluate rows, columns, and diagonals
-    int[][] lines = {
-        {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
-        {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
-        {0, 4, 8}, {2, 4, 6}             // Diagonals
-    };
-
-    for (int[] line : lines) {
-        int playerCount = 0, opponentCount = 0;
-
-        for (int idx : line) {
-            if (globalBoard[idx].equals(currentPlayer)) playerCount++;
-            else if (globalBoard[idx].equals(opponent)) opponentCount++;
+    
+        // Check line formations
+        int[][] lines = {
+            {0, 1, 2}, {3, 4, 5}, {6, 7, 8},
+            {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
+            {0, 4, 8}, {2, 4, 6}
+        };
+    
+        for (int[] line : lines) {
+            int playerCount = 0, opponentCount = 0;
+    
+            for (int idx : line) {
+                if (globalBoard[idx].equals(currentPlayer)) playerCount++;
+                else if (globalBoard[idx].equals(opponent)) opponentCount++;
+            }
+    
+            if (playerCount == 3) return 100000;
+            if (opponentCount == 3) return -100000;
+    
+            if (playerCount > 0 && opponentCount == 0) score += playerCount * 100;
+            if (opponentCount > 0 && playerCount == 0) score -= opponentCount * 120;
         }
-
-        if (playerCount == 3) return 100; // Immediate win
-        if (opponentCount == 3) return -100; // Immediate loss
-
-        if (playerCount > 0 && opponentCount == 0) score += playerCount * 10;
-        if (opponentCount > 0 && playerCount == 0) score -= opponentCount * 10;
+    
+        return score;
     }
-
-    return score;
-}
 
 
     //--------Appel a l'algo pour le jeu--------//
