@@ -204,4 +204,44 @@ public class Plateau{
         System.out.println("    A B C   D E F   G H I");
    }
 
+   //-------- Pour les threads --------//
+
+    public Plateau deepClone() {
+    Plateau clone = new Plateau();
+    clone.setPlayers(this.player.getCurrent().equals("X") ? '1' : '2');
+
+    for (int i = 0; i < 9; i++) {
+        LocalBoard originalBoard = this.getLocalBoard(i);
+        LocalBoard clonedBoard = new LocalBoard();
+
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                String value = originalBoard.getCell(row, col);
+                if (!value.equals("-")) {
+                    clonedBoard.play(row, col, value);
+                }
+            }
+        }
+
+        if (originalBoard.isWon()) {
+            // Force win state
+            for (int row = 0; row < 3 && !clonedBoard.isWon(); row++) {
+                for (int col = 0; col < 3 && !clonedBoard.isWon(); col++) {
+                    if (clonedBoard.getCell(row, col).equals("-")) {
+                        clonedBoard.play(row, col, originalBoard.getWinner());
+                        clonedBoard.undo(row, col); // remove the temp move
+                    }
+                }
+            }
+        }
+
+        clone.globalBoard.put(i, clonedBoard);
+    }
+
+    clone.getWonLocalBoards().addAll(this.getWonLocalBoards());
+    clone.recalculateFilledCells();
+    return clone;
+}
+
+
 }

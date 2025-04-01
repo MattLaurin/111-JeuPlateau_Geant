@@ -94,16 +94,27 @@ public class Client1 {
                     input.read(aBuffer,0,size);
                     String s = new String(aBuffer);
                     System.out.println("Partie Terminé. Le dernier coup joué est: "+s);
-                    String move = null;
-                    move = console.readLine();
-                    output.write(move.getBytes(),0,move.length());
-                    output.flush();
+                    // String move = null;
+                    // move = console.readLine();
+                    // output.write(move.getBytes(),0,move.length());
+                    // output.flush();
 
+                    System.out.println("👋 Fermeture du programme...");
+                    try {
+                        Thread.sleep(30000); // att 30 seconds
+                    } catch (InterruptedException e) {
+                     e.printStackTrace();
+                    }
+
+                    input.close();
+                    output.close();
+                    MyClient.close();
+                    System.exit(0);
                 }
+
             }
         }catch (IOException e) {
             System.out.println(e);
         }
-
     }
 }

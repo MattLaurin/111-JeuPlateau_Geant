@@ -1,4 +1,5 @@
-import java.util.ArrayList;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class MiniMax {
 
@@ -6,60 +7,87 @@ public class MiniMax {
     private long StartTime; 
     private long timeLimit = 3000; // 3 secondes
 
+    private volatile int maxDepthReached = 0;
+
     public MiniMax(Player player) {
         this.player = player;
     }
 
     public String getNextMove(String move, Plateau plateau) {
+    ArrayList<String> moveDispo;
+    int forcedBoardIndex = move.equals("") ? -1 : plateau.returnGlobalCase(move);
+    moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
 
-        ArrayList<String> moveDispo;
-        int forcedBoardIndex=0;
-        plateau.recalculateFilledCells();
 
-        
+    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    StartTime = System.currentTimeMillis();
+    maxDepthReached = 0;
 
-        if(move.equals("")){
-            moveDispo = Algo.generateMove(move, plateau, -1);
-        }else{
-            forcedBoardIndex = plateau.returnGlobalCase(move);
-            moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
-        }
-        
-        // Time tracked a partir d'ici <-- 
-        StartTime = System.currentTimeMillis();
-        //
+    String bestMoveSoFar = moveDispo.get(0); // fallback a un ancien move.
+    int bestScoreSoFar = Integer.MIN_VALUE;
 
-        int bestVal = Integer.MIN_VALUE;
-        String bestMove = "";
+    int currentDepth = 1;
+    int maxAllowedDepth = 10;
+    while (currentDepth <= maxAllowedDepth) {
+        List<Future<MoveScore>> futures = new ArrayList<>();
+        int depthForThisRound = currentDepth;
+        long timeRemaining = timeLimit - (System.currentTimeMillis() - StartTime);
 
+        if (timeRemaining < 100) break; //Ta pas asser de temps so pas de sens de le faire
 
         for (String m : moveDispo) {
-            plateau.play(m, player.getCurrent());
+            Plateau cloned = plateau.deepClone();
+            futures.add(executor.submit(() -> {
+                cloned.play(m, player.getCurrent());
+                int forcedBoard = cloned.returnGlobalCase(m);
+                int baseScore = minimax(1, false, Integer.MIN_VALUE, Integer.MAX_VALUE, cloned, m, forcedBoard, depthForThisRound);
 
-            int oppForcedBoard = plateau.returnGlobalCase(m);
-            int baseVal = minimax(0, false, Integer.MIN_VALUE, Integer.MAX_VALUE, plateau, m, oppForcedBoard);
+                int boardControlScore = evaluateBoardControl(cloned, forcedBoard);
+                int openingScore = evaluateOpening(m, cloned);
+                int totalScore = baseScore * 2 + boardControlScore * 3 + openingScore;
 
-            // Force bonus pour max la strat
-            int boardControlScore = evaluateBoardControl(plateau, oppForcedBoard);
-            int openingScore = evaluateOpening(m, plateau);
-            
+                return new MoveScore(m, totalScore);
+            }));
+        }
 
-            int totalVal = baseVal * 2 + boardControlScore * 3 + openingScore; // Adjusted weights
-            if (totalVal > bestVal) {
-                bestVal = totalVal;
-                bestMove = m;
+        boolean completedInTime = true;
+        List<MoveScore> results = new ArrayList<>();
+
+        for (Future<MoveScore> f : futures) {
+            try {
+                long timeLeft = timeLimit - (System.currentTimeMillis() - StartTime);
+                if (timeLeft <= 50) {
+                    completedInTime = false;
+                    break;
+                }
+                results.add(f.get(timeLeft, TimeUnit.MILLISECONDS));
+            } catch (TimeoutException e) {
+                completedInTime = false;
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            plateau.undo(m);
         }
 
-        // If time is up, return the best move found so far
-        if (System.currentTimeMillis() - StartTime > timeLimit) {
-        return bestMove;
-        }
+        if (!completedInTime) break;
 
-        return bestMove;
+        // Trouver meilleur move pour x depth
+        MoveScore bestAtThisDepth = results.stream()
+                .max(Comparator.comparingInt(ms -> ms.score))
+                .orElse(new MoveScore(bestMoveSoFar, bestScoreSoFar));
+
+        bestMoveSoFar = bestAtThisDepth.move;
+        bestScoreSoFar = bestAtThisDepth.score;
+        maxDepthReached = currentDepth;
+
+        currentDepth++;
     }
+
+    executor.shutdownNow();
+    System.out.println("Final best move: " + bestMoveSoFar + " | depth=" + maxDepthReached);
+    return bestMoveSoFar;
+}
+
 
 
     //--------Code Pour getNextMove--------//
@@ -69,7 +97,7 @@ public class MiniMax {
         if (forcedBoardIndex >= 0 && forcedBoardIndex < 9 && !plateau.getWonLocalBoards().contains(forcedBoardIndex)) {
             boardControlScore = Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
         } else if (plateau.getWonLocalBoards().contains(forcedBoardIndex)) {
-            boardControlScore = 120; // Boost because it's the best
+            boardControlScore = 120; // Boost  --> c the best
         }
         return boardControlScore;
     }
@@ -90,66 +118,58 @@ public class MiniMax {
 
 
     // Minimax Algorithm with et elagage Alpha-Beta 
-    private int minimax(int depth, boolean isMax, int alpha, int beta, Plateau plateau, String lastMove, int forcedBoardIndex) {
-
-        if (System.currentTimeMillis() - StartTime > timeLimit) {
-            return Algo.evaluateGlobal(plateau, player);
-        }
-
-        int maxDepth = 6;
-        if (System.currentTimeMillis() - StartTime > timeLimit - 500) {
-            maxDepth = 4; // Lower depth if the remaining time is below a threshold
-        }
-
-        int score = Algo.evaluateGlobal(plateau, player);
-
-        if (score == 0) {
-            int heuristic = 0;
-            for (int i = 0; i < 9; i++) {
-                heuristic += Algo.evaluateLocal(plateau.getLocalBoard(i), player);
-            }
-            score = heuristic;
-        }
-
-        if (Math.abs(score) >= 100000 || plateau.isGameOver() || depth == maxDepth) {
-            return score - depth;
-        }
-
-        ArrayList<String> listeMovesAvailables = Algo.generateMove(lastMove, plateau, forcedBoardIndex);
-
-        listeMovesAvailables.sort((move1, move2) -> {
-            plateau.play(move1, player.getCurrent());
-            int score1 = Algo.evaluateGlobal(plateau, player) + Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
-            plateau.undo(move1);
-            plateau.play(move2, player.getCurrent());
-            int score2 = Algo.evaluateGlobal(plateau, player) + Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
-            plateau.undo(move2);
-
-            return Integer.compare(score2, score1);
-        });
-
-        if (isMax) {
-            int best = Integer.MIN_VALUE;
-            for (String me : listeMovesAvailables) {
-                plateau.play(me, player.getCurrent());
-                int newForced = plateau.returnGlobalCase(me);
-                best = Math.max(best, minimax(depth + 1, false, alpha, beta, plateau, me, newForced));
-                plateau.undo(me);
-                alpha = Math.max(alpha, best);
-                if (beta <= alpha) break;
-            }
-            return best;
-        } else {
-            int best = Integer.MAX_VALUE;
-            for (String ma : listeMovesAvailables) {
-                plateau.play(ma, player.getOpponent());
-                int newForced = plateau.returnGlobalCase(ma);
-                best = Math.min(best, minimax(depth + 1, true, alpha, beta, plateau, ma, newForced));
-                plateau.undo(ma);
-                beta = Math.min(beta, best);
-                if (beta <= alpha) break;
-            }
-            return best;
-        }
+    private int minimax(int depth, boolean isMax, int alpha, int beta, Plateau plateau, String lastMove, int forcedBoardIndex, int maxDepth) {
+    if (System.currentTimeMillis() - StartTime > timeLimit - 30) {
+        return Algo.evaluateGlobal(plateau, player);
     }
+
+    int score = Algo.evaluateGlobal(plateau, player);
+
+    // Ca sert a rien, c'etait juste pour voir le maxdepth.
+    if (!Thread.currentThread().getName().contains("pool")) {
+        maxDepthReached = Math.max(maxDepthReached, depth);
+    }
+
+    if (Math.abs(score) >= 100000 || plateau.isGameOver() || depth == maxDepth) {
+        return score - depth;
+    }
+
+    ArrayList<String> moves = Algo.generateMove(lastMove, plateau, forcedBoardIndex);
+
+    // Optionel : Trier les moves, mais je sais pas si ca aide tant que ca
+    moves.sort((move1, move2) -> {
+        plateau.play(move1, player.getCurrent());
+        int score1 = Algo.evaluateGlobal(plateau, player) + Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
+        plateau.undo(move1);
+        plateau.play(move2, player.getCurrent());
+        int score2 = Algo.evaluateGlobal(plateau, player) + Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
+        plateau.undo(move2);
+        return Integer.compare(score2, score1); // decroissant
+    });
+
+    if (isMax) {
+        int best = Integer.MIN_VALUE;
+        for (String m : moves) {
+            plateau.play(m, player.getCurrent());
+            int newForced = plateau.returnGlobalCase(m);
+            best = Math.max(best, minimax(depth + 1, false, alpha, beta, plateau, m, newForced, maxDepth));
+            plateau.undo(m);
+            alpha = Math.max(alpha, best);
+            if (beta <= alpha) break;
+        }
+        return best;
+    } else {
+        int best = Integer.MAX_VALUE;
+        for (String m : moves) {
+            plateau.play(m, player.getOpponent());
+            int newForced = plateau.returnGlobalCase(m);
+            best = Math.min(best, minimax(depth + 1, true, alpha, beta, plateau, m, newForced, maxDepth));
+            plateau.undo(m);
+            beta = Math.min(beta, best);
+            if (beta <= alpha) break;
+        }
+        return best;
+    }
+}
+
 }
