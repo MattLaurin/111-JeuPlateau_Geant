@@ -26,8 +26,8 @@ public class MiniMax {
     String bestMoveSoFar = moveDispo.get(0); // fallback a un ancien move.
     int bestScoreSoFar = Integer.MIN_VALUE;
 
-    int currentDepth = 1;
-    int maxAllowedDepth = 10;
+    int currentDepth = 6;
+    int maxAllowedDepth = 6;
     while (currentDepth <= maxAllowedDepth) {
         List<Future<MoveScore>> futures = new ArrayList<>();
         int depthForThisRound = currentDepth;
@@ -78,6 +78,7 @@ public class MiniMax {
 
         bestMoveSoFar = bestAtThisDepth.move;
         bestScoreSoFar = bestAtThisDepth.score;
+        System.out.println("Best score at depth " + currentDepth + ":" + bestScoreSoFar);
         maxDepthReached = currentDepth;
 
         currentDepth++;
