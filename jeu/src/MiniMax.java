@@ -15,9 +15,17 @@ public class MiniMax {
 
     public String getNextMove(String move, Plateau plateau) {
     ArrayList<String> moveDispo;
-    int forcedBoardIndex = move.equals("") ? -1 : plateau.returnGlobalCase(move);
+
+    int forcedBoardIndex;
+    if (move.equals("")) {
+        forcedBoardIndex = -1;
+    } else {
+        forcedBoardIndex = plateau.returnGlobalCase(move);
+    }
+
     moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
 
+    plateau.recalculateFilledCells();
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     StartTime = System.currentTimeMillis();
@@ -27,13 +35,20 @@ public class MiniMax {
     int bestScoreSoFar = Integer.MIN_VALUE;
 
     int currentDepth = 6;
-    int maxAllowedDepth = 6;
+    int maxAllowedDepth = 8;
+
+    // Deph augmente vers le endgame
+    int totalMovesPlayed = plateau.getFilledCellNb();
+    if (totalMovesPlayed >= 50 || moveDispo.size() < 6) {
+        maxAllowedDepth = 10; // boost en endgame
+    }
+
     while (currentDepth <= maxAllowedDepth) {
         List<Future<MoveScore>> futures = new ArrayList<>();
         int depthForThisRound = currentDepth;
         long timeRemaining = timeLimit - (System.currentTimeMillis() - StartTime);
 
-        if (timeRemaining < 100) break; //Ta pas asser de temps so pas de sens de le faire
+        if (timeRemaining < 100) break;
 
         for (String m : moveDispo) {
             Plateau cloned = plateau.deepClone();
@@ -56,7 +71,7 @@ public class MiniMax {
         for (Future<MoveScore> f : futures) {
             try {
                 long timeLeft = timeLimit - (System.currentTimeMillis() - StartTime);
-                if (timeLeft <= 50) {
+                if (timeLeft <= 5) {
                     completedInTime = false;
                     break;
                 }
@@ -71,14 +86,12 @@ public class MiniMax {
 
         if (!completedInTime) break;
 
-        // Trouver meilleur move pour x depth
         MoveScore bestAtThisDepth = results.stream()
                 .max(Comparator.comparingInt(ms -> ms.score))
                 .orElse(new MoveScore(bestMoveSoFar, bestScoreSoFar));
 
         bestMoveSoFar = bestAtThisDepth.move;
         bestScoreSoFar = bestAtThisDepth.score;
-        System.out.println("Best score at depth " + currentDepth + ":" + bestScoreSoFar);
         maxDepthReached = currentDepth;
 
         currentDepth++;
@@ -126,7 +139,6 @@ public class MiniMax {
 
     int score = Algo.evaluateGlobal(plateau, player);
 
-    // Ca sert a rien, c'etait juste pour voir le maxdepth.
     if (!Thread.currentThread().getName().contains("pool")) {
         maxDepthReached = Math.max(maxDepthReached, depth);
     }
@@ -137,20 +149,30 @@ public class MiniMax {
 
     ArrayList<String> moves = Algo.generateMove(lastMove, plateau, forcedBoardIndex);
 
-    // Optionel : Trier les moves, mais je sais pas si ca aide tant que ca
-    moves.sort((move1, move2) -> {
-        plateau.play(move1, player.getCurrent());
-        int score1 = Algo.evaluateGlobal(plateau, player) + Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
-        plateau.undo(move1);
-        plateau.play(move2, player.getCurrent());
-        int score2 = Algo.evaluateGlobal(plateau, player) + Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
-        plateau.undo(move2);
-        return Integer.compare(score2, score1); // decroissant
-    });
+    // ----- Tri intelligent des coups avec MoveScore -----
+    List<MoveScore> orderedMoves = new ArrayList<>();
+    for (String m : moves) {
+        plateau.play(m, isMax ? player.getCurrent() : player.getOpponent());
+        int forcedBoard = plateau.returnGlobalCase(m);
 
+        int evalGlobal = Algo.evaluateGlobal(plateau, player);
+        int evalLocal = (forcedBoard >= 0 && forcedBoard < 9)
+            ? Algo.evaluateLocal(plateau.getLocalBoard(forcedBoard), player)
+            : 0;
+
+        plateau.undo(m);
+        orderedMoves.add(new MoveScore(m, evalGlobal + evalLocal));
+    }
+
+    orderedMoves.sort((a, b) -> isMax
+        ? Integer.compare(b.score, a.score)
+        : Integer.compare(a.score, b.score));
+
+    // ----- Minimax principal -----
     if (isMax) {
         int best = Integer.MIN_VALUE;
-        for (String m : moves) {
+        for (MoveScore ms : orderedMoves) {
+            String m = ms.move;
             plateau.play(m, player.getCurrent());
             int newForced = plateau.returnGlobalCase(m);
             best = Math.max(best, minimax(depth + 1, false, alpha, beta, plateau, m, newForced, maxDepth));
@@ -161,7 +183,8 @@ public class MiniMax {
         return best;
     } else {
         int best = Integer.MAX_VALUE;
-        for (String m : moves) {
+        for (MoveScore ms : orderedMoves) {
+            String m = ms.move;
             plateau.play(m, player.getOpponent());
             int newForced = plateau.returnGlobalCase(m);
             best = Math.min(best, minimax(depth + 1, true, alpha, beta, plateau, m, newForced, maxDepth));
@@ -172,5 +195,6 @@ public class MiniMax {
         return best;
     }
 }
+
 
 }

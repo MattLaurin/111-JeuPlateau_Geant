@@ -11,9 +11,11 @@ public class Client1 {
         final Plateau plateau = new Plateau();
 
         try {
-            System.out.println("Veuillez entré l'adresse du serveur: ");
+            BufferedReader connection = new BufferedReader(new InputStreamReader(System.in));
+            System.out.print("Entrez l'adresse IP du serveur (ex: localhost ou 127.0.0.1) : ");
+            String ip = connection.readLine().trim();
 
-            MyClient = new Socket("localhost", 8888);
+            MyClient = new Socket(ip, 8888);
 
             input = new BufferedInputStream(MyClient.getInputStream());
             output = new BufferedOutputStream(MyClient.getOutputStream());
@@ -21,11 +23,11 @@ public class Client1 {
             while(true){
                 char cmd = 0;
                 cmd = (char)input.read();
-                System.out.println(cmd);
+                //System.out.println(cmd);
 
                 // Debut de la partie en joueur Rouge
                 if(cmd == '1'){
-                    System.out.println("Nouvelle partie! Vous jouer Rouge, entrez votre premier coup : ");
+                    //System.out.println("Nouvelle partie! Vous jouer Rouge, entrez votre premier coup : ");
                     byte[] aBuffer = new byte[1024];
                     int size = input.available();
                     input.read(aBuffer,0,size);
@@ -34,10 +36,10 @@ public class Client1 {
                     plateau.setPlayers(cmd);
 
                     String move = plateau.getNextMove(""); // ICI PROBLEME 
-                    System.out.println("Le move jouer est : " + move);
+                    //System.out.println("Le move jouer est : " + move);
                     
                     plateau.play(move, plateau.getPlayers().getCurrent());
-                    plateau.printBoard();
+                    //plateau.printboard();
 
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
@@ -45,14 +47,14 @@ public class Client1 {
 
                 // Debut de la partie en joueur Noir
                if(cmd == '2'){
-                    System.out.println("Nouvelle partie! Vous jouer noir, attendez le coup des blancs");
+                    //System.out.println("Nouvelle partie! Vous jouer noir, attendez le coup des rouges");
                     byte[] aBuffer = new byte[1024];
                     int size = input.available();
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
                     plateau.setPlayers(cmd);
-                    plateau.printBoard();
+                    //plateau.printboard();
                 }
 
                 // Le serveur demande le prochain coup
@@ -64,14 +66,14 @@ public class Client1 {
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
-                    System.out.println("Dernier coup reçu du serveur : " + s + " (length: " + s.length() + ")");
+                    //System.out.println("Dernier coup reçu du serveur : " + s + " (length: " + s.length() + ")");
                     plateau.play(s.replaceAll("\\s", ""),plateau.getPlayers().getOpponent());
-                    plateau.printBoard();
+                    //plateau.printboard();
                     
                     String move = plateau.getNextMove(s);;
-                    System.out.println("-------------Le best Move est: "+move);
+                    //System.out.println("-------------Le best Move est: "+move);
                     plateau.play(move, plateau.getPlayers().getCurrent());
-                    plateau.printBoard();
+                    //plateau.printboard();
 
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
@@ -80,7 +82,7 @@ public class Client1 {
 
                 // Le dernier coup est invalide
                 if(cmd == '4'){
-                    System.out.println("Coup invalide, entrez un nouveau coup : ");
+                    //System.out.println("Coup invalide, entrez un nouveau coup : ");
                     String move = null;
                     move = console.readLine();
                     output.write(move.getBytes(),0,move.length());
@@ -93,15 +95,9 @@ public class Client1 {
                     int size = input.available();
                     input.read(aBuffer,0,size);
                     String s = new String(aBuffer);
-                    System.out.println("Partie Terminé. Le dernier coup joué est: "+s);
-                    // String move = null;
-                    // move = console.readLine();
-                    // output.write(move.getBytes(),0,move.length());
-                    // output.flush();
-
                     System.out.println("👋 Fermeture du programme...");
                     try {
-                        Thread.sleep(30000); // att 30 seconds
+                        Thread.sleep(2500); // att 2.5sec
                     } catch (InterruptedException e) {
                      e.printStackTrace();
                     }
