@@ -77,11 +77,12 @@ public class Plateau{
     }
 
     public boolean isGameOver(){
-        if (GlobalIsWon){
+        if (GlobalIsWon) {
             return true;
         }
-        for (int i=0; i<nbPlateau; i++){
-            if (!globalBoard.get(i).isWon()){
+        for (int i = 0; i < 9; i++) {
+            LocalBoard lb = globalBoard.get(i);
+            if (!lb.isWon() && !lb.isFull()) {
                 return false;
             }
         }

@@ -13,6 +13,8 @@ public class MiniMax {
         this.player = player;
     }
 
+    //--------Code Pour getNextMove--------//
+
     public String getNextMove(String move, Plateau plateau) {
     ArrayList<String> moveDispo;
 
@@ -39,8 +41,14 @@ public class MiniMax {
 
     // Deph augmente vers le endgame
     int totalMovesPlayed = plateau.getFilledCellNb();
-    if (totalMovesPlayed >= 50 || moveDispo.size() < 6) {
-        maxAllowedDepth = 10; // boost en endgame
+    int boardsLeft = 9- plateau.getWonLocalBoards().size();
+
+    if (totalMovesPlayed >= 50 || moveDispo.size() <= 5 || boardsLeft <= 2) {
+        maxAllowedDepth = 12;
+    } else if (totalMovesPlayed >= 35) {
+        maxAllowedDepth = 10;
+    } else if (totalMovesPlayed >= 20) {
+        maxAllowedDepth = 9;
     }
 
     while (currentDepth <= maxAllowedDepth) {
@@ -104,7 +112,7 @@ public class MiniMax {
 
 
 
-    //--------Code Pour getNextMove--------//
+    //--------Code pour choisir le best move--------//
 
     private int evaluateBoardControl(Plateau plateau, int forcedBoardIndex) {
         int boardControlScore = 0;

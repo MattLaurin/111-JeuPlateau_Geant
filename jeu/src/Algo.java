@@ -128,10 +128,11 @@ public class Algo {
             }
     
             if (playerCount == 3) return 100000;
-            if (opponentCount == 3) return -100000;
+            if (opponentCount == 3 ) return -100000;
     
             if (playerCount > 0 && opponentCount == 0) score += playerCount * 100;
             if (opponentCount > 0 && playerCount == 0) score -= opponentCount * 120;
+            
         }
     
         return score;
@@ -145,7 +146,7 @@ public class Algo {
     List<Integer> wonBoards = plateau.getWonLocalBoards();
 
     
-    if (forcedBoardIndex != -1 && !wonBoards.contains(forcedBoardIndex)) {
+    if (forcedBoardIndex != -1 && !wonBoards.contains(forcedBoardIndex) && !plateau.getLocalBoard(forcedBoardIndex).isFull()) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 if (plateau.getLocalBoard(forcedBoardIndex).getCell(row, col).equals("-")) {
@@ -155,7 +156,7 @@ public class Algo {
         }
     } else {
         for (int i = 0; i < 9; i++) {
-            if (!wonBoards.contains(i)) {
+            if (!wonBoards.contains(i) && !plateau.getLocalBoard(i).isFull()) {
                 for (int row = 0; row < 3; row++) {
                     for (int col = 0; col < 3; col++) {
                         if (plateau.getLocalBoard(i).getCell(row, col).equals("-")) {
@@ -167,7 +168,6 @@ public class Algo {
         }
     }
 
-    
     return availableMoves;
 }
 

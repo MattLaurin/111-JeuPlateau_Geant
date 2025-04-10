@@ -2,6 +2,7 @@ public class LocalBoard {
     private String[][] board = new String[3][3];
     private boolean won = false;
     private String winner = "";
+    private boolean isDraw = false;
 
     public LocalBoard() {
         for (int i = 0; i < 3; i++) {
@@ -18,11 +19,17 @@ public class LocalBoard {
                 won = true;
                 winner = player;
             }
+            else if (isFull()) {
+                isDraw = true;
+            }
         }
     }
 
     public void undo(int row, int col){
         board[row][col] = "-";
+        won=false;
+        isDraw=false;
+        winner="";
     }
 
     public boolean isWon() {
@@ -44,6 +51,20 @@ public class LocalBoard {
     public void resetWinStatus() {
         this.won = false;
         this.winner = "";
+        this.isDraw = false;
+    }
+
+    public boolean isDraw() {
+        return isDraw;
+    }
+
+    public boolean isFull() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j].equals("-")) return false;
+            }
+        }
+        return true;
     }
 
     private boolean checkWin(int row, int col, String player) {
