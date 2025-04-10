@@ -23,11 +23,10 @@ public class Client1 {
             while(true){
                 char cmd = 0;
                 cmd = (char)input.read();
-                //System.out.println(cmd);
 
+                
                 // Debut de la partie en joueur Rouge
                 if(cmd == '1'){
-                    //System.out.println("Nouvelle partie! Vous jouer Rouge, entrez votre premier coup : ");
                     byte[] aBuffer = new byte[1024];
                     int size = input.available();
                     input.read(aBuffer,0,size);
@@ -35,11 +34,10 @@ public class Client1 {
                     String s = new String(aBuffer).trim();
                     plateau.setPlayers(cmd);
 
-                    String move = plateau.getNextMove(""); // ICI PROBLEME 
-                    //System.out.println("Le move jouer est : " + move);
+                    String move = plateau.getNextMove("");
                     
                     plateau.play(move, plateau.getPlayers().getCurrent());
-                    //plateau.printboard();
+                    plateau.addFilledCell();
 
                     output.write(move.getBytes(),0,move.length());
                     output.flush();
@@ -47,14 +45,12 @@ public class Client1 {
 
                 // Debut de la partie en joueur Noir
                if(cmd == '2'){
-                    //System.out.println("Nouvelle partie! Vous jouer noir, attendez le coup des rouges");
                     byte[] aBuffer = new byte[1024];
                     int size = input.available();
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
                     plateau.setPlayers(cmd);
-                    //plateau.printboard();
                 }
 
                 // Le serveur demande le prochain coup
@@ -66,14 +62,13 @@ public class Client1 {
                     input.read(aBuffer,0,size);
 
                     String s = new String(aBuffer).trim();
-                    //System.out.println("Dernier coup reçu du serveur : " + s + " (length: " + s.length() + ")");
                     plateau.play(s.replaceAll("\\s", ""),plateau.getPlayers().getOpponent());
-                    //plateau.printboard();
+                    plateau.addFilledCell();
                     
                     String move = plateau.getNextMove(s);;
-                    //System.out.println("-------------Le best Move est: "+move);
                     plateau.play(move, plateau.getPlayers().getCurrent());
-                    //plateau.printboard();
+                    
+                    plateau.addFilledCell();
 
                     output.write(move.getBytes(),0,move.length());
                     output.flush();

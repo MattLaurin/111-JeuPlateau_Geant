@@ -124,20 +124,9 @@ public class Plateau{
         return filledCellCount;
     }
 
-    public void recalculateFilledCells(){
-        filledCellCount = 0;
-        for (int i =0; i<nbPlateau; i++){
-            String[][] board = globalBoard.get(i).getBoard();
-            for (int j = 0; j < nbRow; j++){
-                for (int k = 0; k < nbCol; k++){
-                    if (!board[j][k].equals("-")){
-                        filledCellCount++;
-                    }
-                }
-            }
-        }
+    public void addFilledCell(){
+        this.filledCellCount++;
     }
-
 
     //--------Partie Jeu--------//
 
@@ -240,7 +229,7 @@ public class Plateau{
     }
 
     clone.getWonLocalBoards().addAll(this.getWonLocalBoards());
-    clone.recalculateFilledCells();
+    clone.filledCellCount = this.filledCellCount;
     return clone;
 }
 

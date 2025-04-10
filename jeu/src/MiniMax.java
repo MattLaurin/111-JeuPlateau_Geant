@@ -27,7 +27,6 @@ public class MiniMax {
 
     moveDispo = Algo.generateMove(move, plateau, forcedBoardIndex);
 
-    plateau.recalculateFilledCells();
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     StartTime = System.currentTimeMillis();
@@ -39,17 +38,7 @@ public class MiniMax {
     int currentDepth = 6;
     int maxAllowedDepth = 8;
 
-    // Deph augmente vers le endgame
-    int totalMovesPlayed = plateau.getFilledCellNb();
-    int boardsLeft = 9- plateau.getWonLocalBoards().size();
-
-    if (totalMovesPlayed >= 50 || moveDispo.size() <= 5 || boardsLeft <= 2) {
-        maxAllowedDepth = 12;
-    } else if (totalMovesPlayed >= 35) {
-        maxAllowedDepth = 10;
-    } else if (totalMovesPlayed >= 20) {
-        maxAllowedDepth = 9;
-    }
+    
 
     while (currentDepth <= maxAllowedDepth) {
         List<Future<MoveScore>> futures = new ArrayList<>();
@@ -126,7 +115,7 @@ public class MiniMax {
 
     private int evaluateOpening(String move, Plateau plateau) {
         int openingBonus = 0;
-        if (plateau.getWonLocalBoards().isEmpty()) {
+        if (plateau.getFilledCellNb() == 0 && player.getCurrent().equalsIgnoreCase("X")) {
             if (move.equals("E5")) openingBonus = 1000; // Center
             else if ("A1 A9 I1 I9".contains(move)) openingBonus = 800; // Corners
             else if ("A5 E1 E9 I5".contains(move)) openingBonus = 500; // Edges
