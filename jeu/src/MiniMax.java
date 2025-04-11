@@ -104,14 +104,22 @@ public class MiniMax {
     //--------Code pour choisir le best move--------//
 
     private int evaluateBoardControl(Plateau plateau, int forcedBoardIndex) {
-        int boardControlScore = 0;
-        if (forcedBoardIndex >= 0 && forcedBoardIndex < 9 && !plateau.getWonLocalBoards().contains(forcedBoardIndex)) {
-            boardControlScore = Algo.evaluateLocal(plateau.getLocalBoard(forcedBoardIndex), player);
-        } else if (plateau.getWonLocalBoards().contains(forcedBoardIndex)) {
-            boardControlScore = 120; // Boost  --> c the best
-        }
-        return boardControlScore;
+    if (forcedBoardIndex < 0 || forcedBoardIndex >= 9) return 0;
+
+    LocalBoard lb = plateau.getLocalBoard(forcedBoardIndex);
+
+    // Si le board est gagné ou plein, aucun risque → safe
+    if (plateau.getWonLocalBoards().contains(forcedBoardIndex) || lb.isFull()) {
+        return 200; // Très favorable
     }
+
+    // Si on envoie l'adversaire dans le centre, on évite (sauf domination)
+    if (forcedBoardIndex == 4) {
+        return Algo.evaluateLocal(lb, plateau.getPlayers()) - 50; // on décourage un peu
+    }
+
+    return Algo.evaluateLocal(lb, plateau.getPlayers());
+}
 
     private int evaluateOpening(String move, Plateau plateau) {
         int openingBonus = 0;
