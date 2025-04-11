@@ -35,8 +35,8 @@ public class MiniMax {
     String bestMoveSoFar = moveDispo.get(0); // fallback a un ancien move.
     int bestScoreSoFar = Integer.MIN_VALUE;
 
-    int currentDepth = 6;
-    int maxAllowedDepth = 8;
+    int currentDepth = 8;
+    int maxAllowedDepth = 12;
 
     
 
@@ -56,7 +56,7 @@ public class MiniMax {
 
                 int boardControlScore = evaluateBoardControl(cloned, forcedBoard);
                 int openingScore = evaluateOpening(m, cloned);
-                int totalScore = baseScore * 2 + boardControlScore * 3 + openingScore;
+                int totalScore = baseScore * 3 + boardControlScore * 2 + openingScore;
 
                 return new MoveScore(m, totalScore);
             }));

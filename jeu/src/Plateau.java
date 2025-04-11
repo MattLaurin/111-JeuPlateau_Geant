@@ -196,7 +196,7 @@ public class Plateau{
 
    //-------- Pour les threads --------//
 
-    public Plateau deepClone() {
+   public Plateau deepClone() {
     Plateau clone = new Plateau();
     clone.setPlayers(this.player.getCurrent().equals("X") ? '1' : '2');
 
@@ -213,13 +213,18 @@ public class Plateau{
             }
         }
 
+        // Forcer l’état de victoire ou nul
         if (originalBoard.isWon()) {
-            // Force win state
-            for (int row = 0; row < 3 && !clonedBoard.isWon(); row++) {
-                for (int col = 0; col < 3 && !clonedBoard.isWon(); col++) {
+            // On rejoue une ligne complète sans effet secondaire
+            clonedBoard.play(0, 0, originalBoard.getWinner());
+            clonedBoard.play(0, 1, originalBoard.getWinner());
+            clonedBoard.play(0, 2, originalBoard.getWinner());
+        } else if (originalBoard.isDraw()) {
+            // On remplit toutes les cases pour forcer le draw
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
                     if (clonedBoard.getCell(row, col).equals("-")) {
-                        clonedBoard.play(row, col, originalBoard.getWinner());
-                        clonedBoard.undo(row, col); // remove the temp move
+                        clonedBoard.play(row, col, "X"); // n'importe quoi
                     }
                 }
             }
@@ -231,7 +236,7 @@ public class Plateau{
     clone.getWonLocalBoards().addAll(this.getWonLocalBoards());
     clone.filledCellCount = this.filledCellCount;
     return clone;
-}
+    }
 
 
 }
